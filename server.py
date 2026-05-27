@@ -23,11 +23,12 @@ SEASON_SHEET_MAP = {
 }
 
 SEASONS_META = [
-    ('UCL SS',     'Época de Verão',   '1.ª Edição', '2024',    '18/03/2024', '29/07/2024', False),
-    ('UCL WS',     'Época de Inverno', '1.ª Edição', '2024-25', '05/09/2024', '28/01/2025', False),
-    ('UCL SS 2ed', 'Época de Verão',   '2.ª Edição', '2025',    '06/03/2025', '07/07/2025', False),
-    ('UCL WS 2ed', 'Época de Inverno', '2.ª Edição', '2025-26', '08/09/2025', '19/01/2026', False),
-    ('UCL SS 3ed', 'Época de Verão',   '3.ª Edição', '2026',    '10/03/2026', '14/07/2026', True),
+    #  sheet_name     tipo             edicao          ano       inicio        fim          atual  factor_rows
+    ('UCL SS',     'Época de Verão',   '1.ª Edição', '2024',    '18/03/2024', '29/07/2024', False, (36, 54)),
+    ('UCL WS',     'Época de Inverno', '1.ª Edição', '2024-25', '05/09/2024', '28/01/2025', False, (40, 57)),
+    ('UCL SS 2ed', 'Época de Verão',   '2.ª Edição', '2025',    '06/03/2025', '07/07/2025', False, (55, 73)),
+    ('UCL WS 2ed', 'Época de Inverno', '2.ª Edição', '2025-26', '08/09/2025', '19/01/2026', False, (42, 60)),
+    ('UCL SS 3ed', 'Época de Verão',   '3.ª Edição', '2026',    '10/03/2026', '14/07/2026', True,  (29, 47)),
 ]
 
 
@@ -148,9 +149,17 @@ def extract_seasons():
     wb = openpyxl.load_workbook(EXCEL_PATH, data_only=True)
     seasons = []
 
-    for sheet_name, tipo, edicao, ano, inicio, fim, atual in SEASONS_META:
+    for sheet_name, tipo, edicao, ano, inicio, fim, atual, factor_rows in SEASONS_META:
         ws   = wb[sheet_name]
         rows = list(ws.iter_rows(values_only=True))
+
+        # Read factor lookup table directly from the Excel (col B = jogos, col C = factor)
+        factor_table = {}
+        for r in range(factor_rows[0], factor_rows[1] + 1):
+            key = ws.cell(row=r, column=2).value
+            val = ws.cell(row=r, column=3).value
+            if isinstance(key, (int, float)) and isinstance(val, (int, float)):
+                factor_table[int(key)] = val
 
         match_dates = []
         for col in rows[1][11:]:
@@ -158,15 +167,6 @@ def extract_seasons():
                 match_dates.append(col.strftime('%d/%m/%Y'))
             elif col is not None:
                 match_dates.append(str(col))
-
-        # Count played jornadas (any column with ≥1 result)
-        played_jornadas = 0
-        for i in range(len(match_dates)):
-            for row in rows[2:]:
-                if len(row) > 11 + i and row[11 + i] in ('W', 'L'):
-                    played_jornadas += 1
-                    break
-        played_jornadas = max(played_jornadas, 1)
 
         players = []
         for row in rows[2:]:
@@ -178,16 +178,25 @@ def extract_seasons():
             results = [row[11 + i] if 11 + i < len(row) and row[11 + i] in ('W', 'L') else None
                        for i in range(len(match_dates))]
 
+            # Computar wins/losses/games dos dados W/L brutos (fiável mesmo após updates)
             vitorias = results.count('W')
             derrotas = results.count('L')
             jogos    = vitorias + derrotas
             if jogos == 0:
                 continue
 
-            win_rate  = round(vitorias / jogos, 4)
-            factor    = round(jogos / played_jornadas, 4)
-            media     = round(win_rate * factor, 4)
+            win_rate = round(vitorias / jogos, 4)
 
+            # mediaPonderada: usar o valor cacheado do Excel (calculado pelo próprio Excel)
+            # Se não estiver disponível (célula de fórmula não recalculada), calcular com lookup table
+            cached_media = row[9] if len(row) > 9 and isinstance(row[9], (int, float)) else None
+            if cached_media is not None:
+                media = round(cached_media, 4)
+            else:
+                factor = factor_table.get(jogos, 0)
+                media  = round(win_rate * factor, 4)
+
+            # rank: usar o do Excel directamente (não re-calcular)
             players.append({
                 'rank': int(row[0]),
                 'nome': row[1],
@@ -200,13 +209,9 @@ def extract_seasons():
                 'resultados': results,
             })
 
-        # Re-rank by mediaPonderada
-        players.sort(key=lambda p: -p['mediaPonderada'])
-        rank = 1
-        for i, p in enumerate(players):
-            if i > 0 and p['mediaPonderada'] < players[i-1]['mediaPonderada']:
-                rank = i + 1
-            p['rank'] = rank
+        # Preservar a ordem das linhas do Excel (que reflecte o ranking definido no Excel)
+        # só reordenar por mediaPonderada quando o rank do Excel não está disponível
+        players.sort(key=lambda p: p['rank'])
 
         seasons.append({
             'id': sheet_name.replace(' ', '_'),
