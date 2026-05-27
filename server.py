@@ -4,7 +4,7 @@ Actualiza o Excel quando reportas um jogo e regenera o website.
 Uso: python3 server.py
 """
 
-import json, os, re, socket
+import json, os, re, socket, subprocess
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 import openpyxl
@@ -136,6 +136,7 @@ def process_report(data):
     print(f'  Excel guardado — {len(updated)} células actualizadas')
 
     regenerate_html()
+    git_publish(date_str)
 
     return {'ok': True, 'updated': updated, 'not_found': not_found}
 
@@ -234,6 +235,17 @@ def regenerate_html():
     )
     open(HTML_PATH, 'w', encoding='utf-8').write(new_html)
     print(f'  index.html regenerado — {len(seasons)} épocas')
+
+
+def git_publish(date_str):
+    repo_dir = os.path.dirname(HTML_PATH)
+    try:
+        subprocess.run(['git', 'add', 'index.html'], cwd=repo_dir, check=True, capture_output=True)
+        subprocess.run(['git', 'commit', '-m', f'Jornada {date_str}'], cwd=repo_dir, check=True, capture_output=True)
+        subprocess.run(['git', 'push'], cwd=repo_dir, check=True, capture_output=True)
+        print(f'  ✅ Publicado em https://fcampos99.github.io/retorta-league/')
+    except subprocess.CalledProcessError as e:
+        print(f'  ⚠️  Git push falhou: {e.stderr.decode() if e.stderr else e}')
 
 
 # ── Entry point ─────────────────────────────────────────────────────────────
