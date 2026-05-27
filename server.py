@@ -9,8 +9,9 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
 import openpyxl
 
-EXCEL_PATH = os.path.expanduser('~/Desktop/Retorta-League.xlsx')
-HTML_PATH  = os.path.expanduser('~/Desktop/retorta-league/index.html')
+REPO_DIR   = os.path.dirname(os.path.abspath(__file__))
+EXCEL_PATH = os.path.join(REPO_DIR, 'Retorta-League.xlsx')
+HTML_PATH  = os.path.join(REPO_DIR, 'index.html')
 PORT       = 8765
 
 SEASON_SHEET_MAP = {
@@ -240,7 +241,7 @@ def regenerate_html():
 def git_publish(date_str):
     repo_dir = os.path.dirname(HTML_PATH)
     try:
-        subprocess.run(['git', 'add', 'index.html'], cwd=repo_dir, check=True, capture_output=True)
+        subprocess.run(['git', 'add', 'index.html', 'Retorta-League.xlsx'], cwd=repo_dir, check=True, capture_output=True)
         subprocess.run(['git', 'commit', '-m', f'Jornada {date_str}'], cwd=repo_dir, check=True, capture_output=True)
         subprocess.run(['git', 'push'], cwd=repo_dir, check=True, capture_output=True)
         print(f'  ✅ Publicado em https://fcampos99.github.io/retorta-league/')
