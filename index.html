@@ -391,183 +391,101 @@ function renderReport(){
   const pastDates=season.datas.filter(d=>{ const [dd,mm,yy]=d.split('/'); return new Date(yy,mm-1,dd)<=today; });
   const nextDate=pastDates.find(d=>!playedSet.has(d))||pastDates[pastDates.length-1]||season.datas[0];
   const dateOpts=season.datas.map(d=>{ const [dd,mm,yy]=d.split('/'); const past=new Date(yy,mm-1,dd)<=today; return `<option value="${d}"${d===nextDate?' selected':''}${!past?' disabled style="color:#444"':''}>${d}${playedSet.has(d)?' ✓':past?' ←':''}</option>`; }).join('');
+  const chips=season.jogadores.map(p=>`<span class="chip" data-name="${p.nome}" data-r="" onclick="toggleChip(this)">${p.alcunha}</span>`).join('');
 
   document.getElementById('content').innerHTML=`
     <div class="season-hero">
       <div class="season-title"><h2>Reportar Jogo</h2><p>${season.tipo} · ${season.edicao}</p></div>
     </div>
-    ${!token?`<div class="chat-wrap"><div class="no-token-banner">
-      Para reportar jogos directamente do site, precisas de configurar o teu GitHub token.<br><br>
-      <a onclick="openSettings()">⚙️ Configurar token agora</a> — é só uma vez!<br><br>
-      <span style="font-size:.75rem">Ou usa o terminal: <code style="background:var(--card);padding:.1rem .4rem;border-radius:4px">python3 reportar.py "resultado..."</code></span>
-    </div></div>`:`
-    <div class="chat-wrap" id="chat-wrap">
-      <div class="chat-head">
-        <h3>📋 Reportar Jogo</h3>
-        <div class="chat-status"><span class="dot ok"></span><span>GitHub conectado</span></div>
+    ${!token?`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;text-align:center;color:var(--muted);font-size:.85rem;line-height:2">
+      Para reportar jogos precisas de configurar o teu GitHub token.<br>
+      <button onclick="openSettings()" style="background:var(--gold);color:#000;border:none;border-radius:8px;padding:.5rem 1.2rem;font-weight:700;cursor:pointer;margin-top:.5rem">⚙️ Configurar token</button>
+    </div>`:`
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+      <div style="background:var(--card2);border-bottom:2px solid var(--gold);padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem">
+        <span style="font-family:var(--fh);font-size:1.1rem;color:var(--gold2);text-transform:uppercase;letter-spacing:.04em">📋 Reportar Jogo</span>
+        <div style="display:flex;align-items:center;gap:.4rem;font-size:.75rem"><span class="dot ok"></span><span>GitHub conectado</span></div>
       </div>
-      <div class="chat-msgs" id="chat-msgs">
-        <div class="msg bot">
-          <div class="msg-avatar">⚽</div>
-          <div class="msg-bubble">Olá! Diz-me quem <b>ganhou</b> e quem <b>perdeu</b> hoje.<br>
-          Exemplo: <i>"Campos, Quim e Rodrigo ganharam. Perderam o Capela, Renato e Vieira."</i></div>
+      <div style="padding:1.25rem">
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap">
+          <label style="font-size:.78rem;font-weight:600;color:var(--muted2)">Jornada:</label>
+          <select id="report-date" style="background:#0a1a0d;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.45rem .75rem;font-size:.85rem;cursor:pointer">${dateOpts}</select>
         </div>
-      </div>
-      <div id="date-sel-row" style="display:none;padding:.5rem 1.25rem;">
-        <div class="date-picker-row">
-          <label>Jornada:</label>
-          <select id="report-date">${dateOpts}</select>
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:.65rem">
+          1.º clique <span style="color:var(--green);font-weight:700">● Vitória</span> &nbsp;·&nbsp; 2.º clique <span style="color:var(--red);font-weight:700">● Derrota</span> &nbsp;·&nbsp; 3.º clique retira
         </div>
-      </div>
-      <div class="chat-input-row">
-        <textarea class="chat-input" id="chat-input" rows="1" placeholder="Escreve o resultado..." onkeydown="chatKeydown(event)"></textarea>
-        <button class="btn-send" onclick="sendChat()">➤</button>
+        <div class="chips-wrap" style="margin-bottom:1.25rem">${chips}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.25rem">
+          <div style="background:#0a1a0d;border-radius:8px;padding:.75rem">
+            <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:.3rem">✅ Equipa que ganhou</div>
+            <div id="prev-v" style="color:var(--muted2);font-size:.85rem;line-height:1.6">—</div>
+          </div>
+          <div style="background:#0a1a0d;border-radius:8px;padding:.75rem">
+            <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin-bottom:.3rem">❌ Equipa que perdeu</div>
+            <div id="prev-d" style="color:var(--muted2);font-size:.85rem;line-height:1.6">—</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+          <button class="btn-confirm" id="btn-reportar" onclick="submitReport()">Reportar Jogo</button>
+          <div id="rpt-status" style="font-size:.82rem;flex:1"></div>
+        </div>
       </div>
     </div>`}`;
-  pendingReport=null;
 }
 
-function chatKeydown(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendChat(); } }
-
-function addMsg(role, html){
-  const msgs=document.getElementById('chat-msgs');
-  if(!msgs) return;
-  const av=role==='bot'?'⚽':initials((SEASONS.find(s=>s.atual)||SEASONS[0]).jogadores.find(p=>p.nome.includes('Campos'))?.nome||'FC');
-  msgs.innerHTML+=`<div class="msg ${role}"><div class="msg-avatar">${av}</div><div class="msg-bubble">${html}</div></div>`;
-  msgs.scrollTop=msgs.scrollHeight;
+function toggleChip(el){
+  const c=el.dataset.r;
+  el.dataset.r=c===''?'W':c==='W'?'L':'';
+  el.className='chip'+(el.dataset.r==='W'?' sv':el.dataset.r==='L'?' sd':'');
+  updatePreview();
 }
 
-function sendChat(){
-  const inp=document.getElementById('chat-input');
-  if(!inp) return;
-  const text=inp.value.trim();
-  if(!text) return;
-  inp.value='';
-  addMsg('usr', text.replace(/</g,'&lt;'));
-  parseAndRespond(text);
+function updatePreview(){
+  const W=[],L=[];
+  document.querySelectorAll('.chip').forEach(c=>{ if(c.dataset.r==='W') W.push(c.dataset.name.split(' ')[0]); else if(c.dataset.r==='L') L.push(c.dataset.name.split(' ')[0]); });
+  const ve=document.getElementById('prev-v'),de=document.getElementById('prev-d');
+  if(ve) ve.textContent=W.join(', ')||'—';
+  if(de) de.textContent=L.join(', ')||'—';
 }
 
-/* ── NL PARSING ── */
-function parseResult(text){
+async function submitReport(){
   const season=SEASONS.find(s=>s.atual)||SEASONS[SEASONS.length-1];
-  const all=season.jogadores.map(p=>({nome:p.nome,nick:p.alcunha.toLowerCase()}));
-  const tl=text.toLowerCase();
-
-  // Find split keywords
-  const splitKw=['perderam','perdeu','contra','vs','derrota'];
-  let splitIdx=-1, splitLen=0;
-  for(const kw of splitKw){
-    const idx=tl.indexOf(kw);
-    if(idx!==-1&&(splitIdx===-1||idx<splitIdx)){ splitIdx=idx; splitLen=kw.length; }
-  }
-
-  let winText=tl, loseText='';
-  if(splitIdx!==-1){ winText=tl.substring(0,splitIdx); loseText=tl.substring(splitIdx+splitLen); }
-
-  function matchPlayers(part){
-    return all.filter(p=>
-      part.includes(p.nome.toLowerCase())||
-      (p.nick.length>2&&part.includes(p.nick))
-    ).map(p=>p.nome);
-  }
-
-  const winners=matchPlayers(winText);
-  const losers=matchPlayers(loseText);
-  return {winners, losers, season};
-}
-
-function parseAndRespond(text){
-  const {winners, losers, season}=parseResult(text);
-
-  // Find next date
-  const today=new Date();
-  const playedSet=new Set();
-  season.datas.forEach((d,i)=>{ if(season.jogadores.some(p=>p.resultados[i]!==null)) playedSet.add(d); });
-  const pastDates=season.datas.filter(d=>{ const [dd,mm,yy]=d.split('/'); return new Date(yy,mm-1,dd)<=today; });
-  const nextDate=pastDates.find(d=>!playedSet.has(d))||pastDates[pastDates.length-1]||season.datas[0];
-
-  if(!winners.length&&!losers.length){
-    addMsg('bot','Hmm, não consegui identificar nenhum jogador. Tenta mencionar os nomes ou alcunhas completos 🤔');
-    return;
-  }
-  if(!winners.length){
-    addMsg('bot','Percebi quem perdeu, mas não sei quem ganhou. Podes repetir?');
-    return;
-  }
-  if(!losers.length){
-    addMsg('bot','Percebi quem ganhou, mas não sei quem perdeu. Podes repetir?');
-    return;
-  }
-
-  pendingReport={ season_id:season.id, date:nextDate, winners, losers };
-
-  // Show date selector
-  const drow=document.getElementById('date-sel-row');
-  if(drow){ drow.style.display=''; }
-
-  const wList=winners.map(n=>`<span class="team-v">${n.split(' ')[0]}</span>`).join(', ');
-  const lList=losers.map(n=>`<span class="team-d">${n.split(' ')[0]}</span>`).join(', ');
-
-  addMsg('bot',`Percebi! Vou registar:<br>
-    ✅ <b>Vitória:</b> ${wList}<br>
-    ❌ <b>Derrota:</b> ${lList}<br>
-    📅 <b>Jornada:</b> ${nextDate}<br><br>
-    Confirma a data acima ↑ e clica em <b>Confirmar</b>.
-    <div class="chat-actions">
-      <button class="btn-confirm" onclick="confirmReport()">✅ Confirmar</button>
-      <button class="btn-reset" onclick="resetChat()">Corrigir</button>
-    </div>`);
-}
-
-function resetChat(){
-  pendingReport=null;
-  const drow=document.getElementById('date-sel-row');
-  if(drow) drow.style.display='none';
-  addMsg('bot','Ok! Diz-me de novo o resultado.');
-}
-
-async function confirmReport(){
-  if(!pendingReport) return;
-  // Update date from selector
-  const ds=document.getElementById('report-date');
-  if(ds) pendingReport.date=ds.value;
-
-  // Disable confirm buttons
-  document.querySelectorAll('.btn-confirm').forEach(b=>{ b.disabled=true; b.textContent='A enviar...'; });
-
-  addMsg('bot','<div class="action-progress"><div class="spinner"></div> A enviar para o servidor do GitHub...</div>');
-
-  const token=getToken();
+  const date=document.getElementById('report-date').value;
+  const W=[],L=[];
+  document.querySelectorAll('.chip').forEach(c=>{ if(c.dataset.r==='W') W.push(c.dataset.name); else if(c.dataset.r==='L') L.push(c.dataset.name); });
+  if(!W.length||!L.length){ setRptStatus('Selecciona pelo menos um jogador em cada equipa.','var(--red)'); return; }
+  const btn=document.getElementById('btn-reportar');
+  btn.disabled=true; btn.textContent='A enviar...';
+  setRptStatus('<div class="action-progress"><div class="spinner"></div> A enviar para o GitHub...</div>','');
   try {
     const res=await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WF_FILE}/dispatches`,{
       method:'POST',
-      headers:{'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-      body:JSON.stringify({ref:'main',inputs:{
-        season_id:pendingReport.season_id,
-        date:pendingReport.date,
-        winners:JSON.stringify(pendingReport.winners),
-        losers:JSON.stringify(pendingReport.losers)
-      }})
+      headers:{'Authorization':`token ${getToken()}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({ref:'main',inputs:{season_id:season.id,date,winners:JSON.stringify(W),losers:JSON.stringify(L)}})
     });
     if(res.status===204||res.ok){
-      pendingReport=null;
-      addMsg('bot',`🚀 <b>Enviado!</b> O GitHub está a processar...<br>
-        O site actualiza em cerca de <b>1-2 minutos</b>.<br>
-        <div class="action-progress" id="poll-status"><div class="spinner"></div> A aguardar confirmação...</div>`);
+      btn.textContent='✅ Enviado!';
+      setRptStatus('<div class="action-progress"><div class="spinner"></div> <span id="poll-txt">A processar no GitHub (~2 min)...</span></div>','');
       pollAction();
     } else {
-      const err=await res.json();
-      addMsg('bot',`❌ Erro ${res.status}: ${err.message||'Token inválido ou sem permissões.'}<br><a onclick="openSettings()">Verificar token ⚙️</a>`);
-      document.querySelectorAll('.btn-confirm').forEach(b=>{ b.disabled=false; b.textContent='✅ Confirmar'; });
+      const err=await res.json().catch(()=>({}));
+      setRptStatus(`❌ Erro ${res.status}: ${err.message||'Token inválido?'} <a onclick="openSettings()" style="color:var(--gold2);cursor:pointer">⚙️ Verificar</a>`,'');
+      btn.disabled=false; btn.textContent='Reportar Jogo';
     }
   } catch(e){
-    addMsg('bot','❌ Erro de rede: '+e.message);
-    document.querySelectorAll('.btn-confirm').forEach(b=>{ b.disabled=false; b.textContent='✅ Confirmar'; });
+    setRptStatus('❌ Sem ligação.','');
+    btn.disabled=false; btn.textContent='Reportar Jogo';
   }
 }
 
+function setRptStatus(html,color){
+  const el=document.getElementById('rpt-status');
+  if(el){el.innerHTML=html;el.style.color=color;}
+}
+
 async function pollAction(){
-  await new Promise(r=>setTimeout(r,8000)); // wait 8s before first check
+  await new Promise(r=>setTimeout(r,10000));
   for(let i=0;i<20;i++){
     await new Promise(r=>setTimeout(r,10000));
     try {
@@ -578,16 +496,16 @@ async function pollAction(){
       const data=await res.json();
       const run=data.workflow_runs?.[0];
       if(!run) continue;
-      const el=document.getElementById('poll-status');
       if(run.status==='completed'){
         if(run.conclusion==='success'){
-          if(el) el.innerHTML='✅ <b>Site actualizado!</b> Recarrega a página para ver os novos dados. <button onclick="location.reload()" style="background:var(--gold);border:none;border-radius:6px;padding:.3rem .8rem;cursor:pointer;font-weight:700;color:#000;margin-left:.5rem">Recarregar</button>';
+          setRptStatus('✅ <strong>Site actualizado!</strong> <button onclick="location.reload()" style="background:var(--gold);border:none;border-radius:6px;padding:.3rem .8rem;cursor:pointer;font-weight:700;color:#000;margin-left:.5rem">Recarregar página</button>','var(--green)');
         } else {
-          if(el) el.innerHTML='❌ Algo correu mal. Verifica o GitHub Actions.';
+          setRptStatus(`❌ Algo correu mal. <a href="https://github.com/${REPO}/actions" target="_blank" style="color:var(--gold2)">Ver GitHub Actions</a>`,'');
         }
         return;
       }
-      if(el) el.innerHTML=`<div class="spinner"></div> ${run.status==='in_progress'?'A correr...':'Na fila...'}`;
+      const txt=document.getElementById('poll-txt');
+      if(txt) txt.textContent=run.status==='in_progress'?'A correr no GitHub...':'Na fila...';
     } catch {}
   }
 }
