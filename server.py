@@ -300,6 +300,8 @@ def regenerate_html():
 
 
 def git_publish(date_str):
+    if os.getenv('SKIP_GIT_PUSH'):
+        return
     try:
         subprocess.run(['git', 'add', 'index.html', 'Retorta-League.xlsx'], cwd=REPO_DIR, check=True, capture_output=True)
         subprocess.run(['git', 'commit', '-m', f'Jornada {date_str}'], cwd=REPO_DIR, check=True, capture_output=True)
