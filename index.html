@@ -4,648 +4,287 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Retorta League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --verde: #0d2818;
-    --verde-medio: #1a4a2e;
-    --verde-claro: #2d6a45;
-    --ouro: #d4a017;
-    --ouro-claro: #f0c040;
-    --branco: #f5f5f0;
-    --cinza: #888;
-    --cinza-claro: #ccc;
-    --vitoria: #2ecc71;
-    --derrota: #e74c3c;
-    --ausente: #555;
-    --card-bg: #112b1c;
-    --card-border: #1e4d30;
-  }
+:root {
+  --bg:        #080f09;
+  --bg2:       #0d1a10;
+  --card:      #111e14;
+  --card2:     #0a1a0d;
+  --border:    #1d3d24;
+  --border2:   #254d2e;
+  --gold:      #c8971a;
+  --gold2:     #e8b832;
+  --green:     #2ecc71;
+  --red:       #e74c3c;
+  --text:      #e8ede9;
+  --muted:     #7a957e;
+  --muted2:    #b0c4b3;
+  --font-head: 'Oswald', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-body); min-height:100vh; }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+/* ── HEADER ── */
+header {
+  background: linear-gradient(160deg, #040d05 0%, #0d2912 60%, #163d1c 100%);
+  border-bottom: 2px solid var(--gold);
+  position: sticky; top:0; z-index:100;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+}
+.header-inner {
+  max-width:1280px; margin:0 auto;
+  display:flex; align-items:center; gap:1rem;
+  padding:0.85rem 1.5rem;
+}
+.logo { display:flex; align-items:center; gap:0.8rem; }
+.logo-badge {
+  width:42px; height:42px; background:var(--gold);
+  border-radius:50%; display:flex; align-items:center;
+  justify-content:center; font-size:1.3rem;
+  box-shadow:0 0 16px rgba(200,151,26,0.4);
+}
+.logo h1 {
+  font-family:var(--font-head); font-size:1.55rem;
+  font-weight:700; color:var(--gold2); letter-spacing:0.04em;
+  text-transform:uppercase;
+}
+.live-badge {
+  margin-left:auto;
+  background:var(--gold); color:#000;
+  padding:0.28rem 0.85rem; border-radius:20px;
+  font-size:0.68rem; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100%{box-shadow:0 0 0 0 rgba(200,151,26,0.4)}
+  50%{box-shadow:0 0 0 7px rgba(200,151,26,0)}
+}
 
-  body {
-    background: var(--verde);
-    color: var(--branco);
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-  }
+/* ── SEASON NAV ── */
+.season-nav {
+  background:#050c06; border-bottom:1px solid var(--border);
+  overflow-x:auto; scrollbar-width:none;
+}
+.season-nav::-webkit-scrollbar { display:none; }
+.season-tabs { max-width:1280px; margin:0 auto; display:flex; padding:0 1.5rem; }
+.tab-btn {
+  background:none; border:none; border-bottom:3px solid transparent;
+  color:var(--muted); padding:0.85rem 1.1rem;
+  font-family:var(--font-body); font-size:0.78rem; font-weight:600;
+  letter-spacing:0.04em; text-transform:uppercase;
+  white-space:nowrap; cursor:pointer; transition:all 0.18s;
+}
+.tab-btn:hover { color:var(--text); border-color:var(--border2); }
+.tab-btn.active { color:var(--gold2); border-color:var(--gold); }
+.tab-live {
+  display:inline-block; background:var(--gold); color:#000;
+  font-size:0.55rem; font-weight:800; padding:0.1rem 0.35rem;
+  border-radius:6px; margin-left:0.35rem; vertical-align:middle;
+}
 
-  /* HEADER */
-  header {
-    background: linear-gradient(135deg, #0a1f10 0%, #1a4a2e 100%);
-    border-bottom: 3px solid var(--ouro);
-    padding: 0 1.5rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }
-  .header-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1rem 0;
-    flex-wrap: wrap;
-  }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-  .logo-icon {
-    font-size: 2.2rem;
-    filter: drop-shadow(0 0 8px rgba(212,160,23,0.5));
-  }
-  .logo-text h1 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--ouro-claro);
-    letter-spacing: 0.05em;
-    line-height: 1;
-  }
-  .logo-text span {
-    font-size: 0.75rem;
-    color: var(--cinza-claro);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .header-badge {
-    margin-left: auto;
-    background: var(--ouro);
-    color: #000;
-    padding: 0.3rem 0.9rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(212,160,23,0.4); }
-    50% { box-shadow: 0 0 0 6px rgba(212,160,23,0); }
-  }
+/* ── MAIN ── */
+main { max-width:1280px; margin:2rem auto; padding:0 1.5rem; }
+.fade-in { animation:fadeIn 0.22s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
-  /* SEASON NAV */
-  .season-nav {
-    background: #091a0f;
-    border-bottom: 1px solid var(--card-border);
-    padding: 0 1.5rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .season-nav::-webkit-scrollbar { display: none; }
-  .season-tabs {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    gap: 0;
-  }
-  .tab-btn {
-    background: none;
-    border: none;
-    color: var(--cinza-claro);
-    padding: 0.9rem 1.2rem;
-    cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 600;
-    white-space: nowrap;
-    border-bottom: 3px solid transparent;
-    transition: all 0.2s;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
-  .tab-btn:hover { color: var(--branco); border-color: var(--verde-claro); }
-  .tab-btn.active { color: var(--ouro-claro); border-color: var(--ouro); }
-  .tab-btn .tab-badge {
-    display: inline-block;
-    background: var(--ouro);
-    color: #000;
-    font-size: 0.6rem;
-    padding: 0.1rem 0.35rem;
-    border-radius: 8px;
-    margin-left: 0.3rem;
-    vertical-align: middle;
-    font-weight: 800;
-  }
+/* ── CAPA HERO ── */
+.capa-hero {
+  display:flex; gap:1.5rem; align-items:stretch;
+  background:var(--card); border:1px solid var(--gold);
+  border-radius:14px; overflow:hidden; margin-bottom:2rem;
+}
+.capa-hero-img { flex-shrink:0; width:140px; }
+.capa-hero-img img { width:100%; height:100%; object-fit:cover; display:block; }
+.capa-hero-body { flex:1; padding:1.25rem; display:flex; flex-direction:column; justify-content:center; gap:0.6rem; }
+.capa-hero-tag { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.14em; color:var(--gold); font-weight:700; }
+.capa-hero-date { font-family:var(--font-head); font-size:1.2rem; color:var(--text); }
+.capa-hero-link { font-size:0.75rem; color:var(--muted); background:none; border:none; padding:0; cursor:pointer; text-decoration:underline; text-align:left; }
+.capa-hero-link:hover { color:var(--text); }
 
-  /* MAIN */
-  main {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
-  }
+/* ── SEASON HERO ── */
+.season-hero {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  flex-wrap:wrap; gap:1rem; margin-bottom:1.75rem;
+}
+.season-title h2 { font-family:var(--font-head); font-size:1.6rem; font-weight:700; color:var(--gold2); text-transform:uppercase; letter-spacing:0.03em; }
+.season-title p  { font-size:0.8rem; color:var(--muted); margin-top:0.25rem; }
+.season-pills { display:flex; gap:0.75rem; flex-wrap:wrap; }
+.pill { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:0.55rem 1rem; text-align:center; min-width:80px; }
+.pill-val { font-family:var(--font-head); font-size:1.5rem; color:var(--gold2); line-height:1; }
+.pill-lbl { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.07em; color:var(--muted); margin-top:0.2rem; }
 
-  /* SEASON HERO */
-  .season-hero {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-  .season-title h2 {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--ouro-claro);
-  }
-  .season-title p {
-    font-size: 0.85rem;
-    color: var(--cinza-claro);
-    margin-top: 0.2rem;
-  }
-  .season-stats {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .stat-pill {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    text-align: center;
-  }
-  .stat-pill .val {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: var(--ouro-claro);
-    line-height: 1;
-  }
-  .stat-pill .lbl {
-    font-size: 0.7rem;
-    color: var(--cinza);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-top: 0.2rem;
-  }
+/* ── SECTION TITLE ── */
+.sec-title {
+  font-size:0.63rem; text-transform:uppercase; letter-spacing:0.14em;
+  color:var(--muted); margin-bottom:0.75rem;
+  display:flex; align-items:center; gap:0.6rem;
+}
+.sec-title::after { content:''; flex:1; height:1px; background:var(--border); }
 
-  /* STANDINGS */
-  .section-title {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--cinza);
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--card-border);
-  }
+/* ── STANDINGS TABLE ── */
+.standings-wrap { overflow-x:auto; border-radius:12px; border:1px solid var(--border); }
+table.standings {
+  width:100%; border-collapse:collapse;
+  background:var(--card); font-size:0.88rem;
+}
+table.standings thead tr { background:var(--card2); border-bottom:2px solid var(--gold); }
+table.standings th {
+  padding:0.7rem 0.9rem; text-align:left;
+  font-size:0.62rem; text-transform:uppercase;
+  letter-spacing:0.1em; color:var(--gold); font-weight:700;
+  white-space:nowrap;
+}
+th.c,td.c { text-align:center; }
+table.standings tbody tr { border-bottom:1px solid #172c1a; cursor:pointer; transition:background 0.13s; }
+table.standings tbody tr:last-child { border-bottom:none; }
+table.standings tbody tr:hover { background:#19301e; }
+table.standings td { padding:0.7rem 0.9rem; vertical-align:middle; }
 
-  .standings-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--card-bg);
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid var(--card-border);
-  }
-  .standings-table thead tr {
-    background: #0a1f10;
-    border-bottom: 2px solid var(--ouro);
-  }
-  .standings-table th {
-    padding: 0.75rem 0.8rem;
-    text-align: left;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ouro);
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .standings-table th.num { text-align: center; }
-  .standings-table td {
-    padding: 0.7rem 0.8rem;
-    border-bottom: 1px solid #1a3525;
-    font-size: 0.9rem;
-    vertical-align: middle;
-  }
-  .standings-table tbody tr {
-    transition: background 0.15s;
-    cursor: pointer;
-  }
-  .standings-table tbody tr:hover { background: #1e4030; }
-  .standings-table tbody tr:last-child td { border-bottom: none; }
-  .standings-table td.num { text-align: center; }
+.pos-cell { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; font-family:var(--font-head); font-weight:700; font-size:0.9rem; }
+.p1 { background:var(--gold); color:#000; }
+.p2 { background:#9e9e9e; color:#000; }
+.p3 { background:#a0693a; color:#fff; }
+.pn { background:transparent; color:var(--muted); }
 
-  .pos-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    font-weight: 800;
-    font-size: 0.85rem;
-  }
-  .pos-1 { background: #d4a017; color: #000; }
-  .pos-2 { background: #aaa; color: #000; }
-  .pos-3 { background: #b87333; color: #fff; }
-  .pos-other { background: transparent; color: var(--cinza); }
+.player-avatar {
+  width:32px; height:32px; border-radius:50%;
+  background:var(--border2); display:inline-flex;
+  align-items:center; justify-content:center;
+  font-family:var(--font-head); font-weight:700; font-size:0.75rem;
+  color:var(--gold2); flex-shrink:0;
+}
+.player-info { display:flex; align-items:center; gap:0.65rem; }
+.player-name { font-weight:600; color:var(--text); }
+.player-nick { font-size:0.72rem; color:var(--muted); margin-top:0.1rem; }
 
-  .player-name {
-    font-weight: 700;
-    color: var(--branco);
-  }
-  .player-nick {
-    font-size: 0.75rem;
-    color: var(--cinza);
-    margin-top: 0.1rem;
-  }
+.form-strip { display:flex; gap:2px; }
+.fw { width:16px; height:16px; border-radius:3px; background:var(--green); display:flex; align-items:center; justify-content:center; font-size:0.55rem; font-weight:800; color:#fff; }
+.fl { width:16px; height:16px; border-radius:3px; background:var(--red);   display:flex; align-items:center; justify-content:center; font-size:0.55rem; font-weight:800; color:#fff; }
+.fa { width:16px; height:16px; border-radius:3px; background:#1d3d24; }
 
-  .win-rate-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .bar-track {
-    flex: 1;
-    height: 5px;
-    background: #1a3525;
-    border-radius: 3px;
-    min-width: 60px;
-  }
-  .bar-fill {
-    height: 100%;
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--verde-claro), var(--ouro));
-  }
-  .wr-text {
-    font-weight: 700;
-    font-size: 0.85rem;
-    min-width: 36px;
-    text-align: right;
-  }
+.wr-cell { display:flex; align-items:center; gap:0.5rem; }
+.wr-bar  { flex:1; height:4px; background:#1d3d24; border-radius:2px; min-width:50px; }
+.wr-fill { height:100%; border-radius:2px; }
+.wr-txt  { font-size:0.8rem; font-weight:700; min-width:34px; text-align:right; }
+.mp-val  { font-family:var(--font-head); font-size:1rem; font-weight:600; }
 
-  .form-badges {
-    display: flex;
-    gap: 3px;
-    flex-wrap: wrap;
-  }
-  .form-w {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    background: var(--vitoria);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.6rem;
-    font-weight: 800;
-    color: #fff;
-  }
-  .form-l {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    background: var(--derrota);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.6rem;
-    font-weight: 800;
-    color: #fff;
-  }
-  .form-a {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    background: var(--ausente);
-    opacity: 0.4;
-  }
+/* ── REPORT SECTION ── */
+.report-section { margin-top:2.5rem; background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.report-head { background:var(--card2); border-bottom:2px solid var(--gold); padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; }
+.report-head h3 { font-family:var(--font-head); font-size:1.1rem; color:var(--gold2); text-transform:uppercase; letter-spacing:0.04em; }
+.srv-status { display:flex; align-items:center; gap:0.4rem; font-size:0.75rem; }
+.dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dot.on  { background:var(--green); box-shadow:0 0 6px var(--green); }
+.dot.off { background:var(--red); }
+.dot.chk { background:var(--gold); animation:pulse 1s infinite; }
+.report-offline {
+  padding:2rem 1.25rem; text-align:center;
+  color:var(--muted); font-size:0.85rem; line-height:1.8;
+}
+.report-offline code { background:var(--card2); padding:0.2rem 0.5rem; border-radius:5px; font-size:0.8rem; color:var(--gold2); }
+.report-body { padding:1.25rem; }
+.date-row { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; flex-wrap:wrap; }
+.date-row label { font-size:0.78rem; font-weight:600; color:var(--muted2); min-width:70px; }
+.date-row select { background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:0.45rem 0.75rem; font-size:0.85rem; cursor:pointer; }
+.chips-hint { font-size:0.72rem; color:var(--muted); margin-bottom:0.65rem; }
+.chips-wrap { display:flex; flex-wrap:wrap; gap:0.3rem; margin-bottom:1.25rem; }
+.chip { background:var(--card2); border:1px solid var(--border); border-radius:20px; padding:0.3rem 0.75rem; font-size:0.78rem; cursor:pointer; user-select:none; transition:all 0.14s; }
+.chip:hover { border-color:var(--border2); }
+.chip.sv { background:rgba(46,204,113,0.12); border-color:var(--green); color:var(--green); font-weight:700; }
+.chip.sd { background:rgba(231,76,60,0.12); border-color:var(--red); color:var(--red); font-weight:700; }
+.preview-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.25rem; }
+.prev-box { background:var(--card2); border-radius:8px; padding:0.75rem; min-height:44px; }
+.prev-box .pl { font-size:0.62rem; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.3rem; }
+.prev-box.pv .pl { color:var(--green); }
+.prev-box.pd .pl { color:var(--red); }
+.prev-box .pn { color:var(--muted2); font-size:0.82rem; line-height:1.6; }
+.extras-wrap { margin-bottom:1rem; }
+.extras-wrap label { font-size:0.73rem; color:var(--muted); display:block; margin-bottom:0.3rem; }
+.extras-wrap input { width:100%; background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:0.45rem 0.75rem; color:var(--text); font-size:0.84rem; }
+.act-row { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+.btn-submit { background:var(--gold); color:#000; border:none; border-radius:8px; padding:0.65rem 1.5rem; font-weight:700; font-size:0.9rem; cursor:pointer; transition:background 0.14s; font-family:var(--font-body); }
+.btn-submit:hover { background:var(--gold2); }
+.btn-submit:disabled { opacity:0.45; cursor:not-allowed; }
+.rpt-msg { font-size:0.82rem; flex:1; }
+.rpt-msg.ok  { color:var(--green); }
+.rpt-msg.err { color:var(--red); }
+.btn-reload { background:var(--border2); color:#fff; border:none; border-radius:6px; padding:0.35rem 0.85rem; cursor:pointer; font-size:0.78rem; font-weight:700; }
 
-  .media-val {
-    font-weight: 800;
-    font-size: 0.9rem;
-  }
+/* ── ALL-TIME ── */
+.champions-grid { display:flex; flex-direction:column; gap:0.75rem; margin-bottom:2rem; }
+.champ-row { display:flex; align-items:center; gap:1rem; background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; }
+.champ-trophy { font-size:1.5rem; flex-shrink:0; }
+.champ-info .cs { font-size:0.68rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); }
+.champ-info .cn { font-family:var(--font-head); font-size:1.05rem; color:var(--gold2); }
+.champ-record { margin-left:auto; font-size:0.75rem; color:var(--muted2); text-align:right; }
+.at-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.5rem; }
+.at-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:1.25rem; }
+.at-card h3 { font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); margin-bottom:1rem; }
+.at-row { display:flex; align-items:center; gap:0.6rem; padding:0.45rem 0.4rem; border-bottom:1px solid #172c1a; cursor:pointer; border-radius:6px; transition:background 0.13s; }
+.at-row:hover { background:#19301e; }
+.at-row:last-child { border-bottom:none; }
+.at-rank { font-size:0.72rem; color:var(--muted); min-width:18px; text-align:center; font-family:var(--font-head); }
+.at-name { flex:1; font-size:0.88rem; font-weight:500; }
+.at-val  { font-family:var(--font-head); font-size:0.95rem; color:var(--gold2); }
 
-  /* ALLTIME */
-  .alltime-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-top: 0.75rem;
-  }
-  .alltime-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 1.25rem;
-  }
-  .alltime-card h3 {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--ouro);
-    margin-bottom: 1rem;
-  }
-  .alltime-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #1a3525;
-    cursor: pointer;
-    transition: background 0.15s;
-    border-radius: 6px;
-    padding: 0.5rem 0.4rem;
-  }
-  .alltime-row:hover { background: #1e4030; }
-  .alltime-row:last-child { border-bottom: none; }
-  .alltime-rank {
-    font-size: 0.75rem;
-    color: var(--cinza);
-    min-width: 18px;
-    text-align: center;
-    font-weight: 700;
-  }
-  .alltime-name { flex: 1; font-weight: 600; font-size: 0.9rem; }
-  .alltime-val {
-    font-weight: 800;
-    color: var(--ouro-claro);
-    font-size: 0.9rem;
-  }
+/* ── CAPAS ── */
+.upload-zone {
+  border:2px dashed var(--border2); border-radius:14px;
+  padding:2.5rem; text-align:center; cursor:pointer;
+  background:var(--card); transition:all 0.18s; margin-bottom:2rem;
+}
+.upload-zone:hover,.upload-zone.drag { border-color:var(--gold); background:#19301e; }
+.upload-icon { font-size:2.5rem; margin-bottom:0.5rem; }
+.upload-txt  { font-weight:600; color:var(--text); margin-bottom:0.2rem; }
+.upload-sub  { font-size:0.73rem; color:var(--muted); }
+.capas-grid  { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:1.25rem; }
+.capa-card   { background:var(--card); border:1px solid var(--border); border-radius:10px; overflow:hidden; cursor:pointer; transition:transform 0.15s; }
+.capa-card:hover { transform:translateY(-4px); }
+.capa-card img { width:100%; display:block; aspect-ratio:3/4; object-fit:cover; }
+.capa-date   { padding:0.5rem 0.75rem; font-size:0.73rem; color:var(--muted2); font-weight:600; }
+.capas-empty { text-align:center; color:var(--muted); padding:3rem; }
 
-  .champions-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  .champion-row {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: #0a1f10;
-    border-radius: 8px;
-    padding: 0.75rem;
-    border: 1px solid var(--card-border);
-  }
-  .champion-trophy { font-size: 1.5rem; }
-  .champion-info .season { font-size: 0.7rem; color: var(--cinza); text-transform: uppercase; letter-spacing: 0.05em; }
-  .champion-info .name { font-weight: 800; color: var(--ouro-claro); }
-  .champion-stats { margin-left: auto; text-align: right; font-size: 0.75rem; color: var(--cinza-claro); }
+/* ── LIGHTBOX ── */
+.lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:300; align-items:center; justify-content:center; }
+.lightbox.open { display:flex; }
+.lb-img { max-width:90vw; max-height:90vh; border-radius:8px; box-shadow:0 8px 40px rgba(0,0,0,0.8); }
+.lb-close { position:absolute; top:1.5rem; right:1.5rem; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer; line-height:1; }
 
-  /* MODAL */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.75);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal {
-    background: #112b1c;
-    border: 1px solid var(--ouro);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 640px;
-    max-height: 85vh;
-    overflow-y: auto;
-    padding: 1.5rem;
-    position: relative;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  }
-  .modal-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    color: var(--cinza);
-    font-size: 1.5rem;
-    cursor: pointer;
-    line-height: 1;
-  }
-  .modal-close:hover { color: var(--branco); }
-  .modal-header {
-    margin-bottom: 1.5rem;
-  }
-  .modal-header h2 {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: var(--ouro-claro);
-  }
-  .modal-header p {
-    color: var(--cinza);
-    font-size: 0.85rem;
-    margin-top: 0.2rem;
-  }
-  .modal-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-  }
-  .modal-stat {
-    background: #0a1f10;
-    border-radius: 8px;
-    padding: 0.75rem;
-    text-align: center;
-    border: 1px solid var(--card-border);
-  }
-  .modal-stat .val { font-size: 1.6rem; font-weight: 800; color: var(--ouro-claro); }
-  .modal-stat .lbl { font-size: 0.65rem; text-transform: uppercase; color: var(--cinza); letter-spacing: 0.05em; margin-top: 0.2rem; }
-  .modal-season-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-  }
-  .modal-season-table th {
-    text-align: left;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ouro);
-    padding: 0.5rem 0.4rem;
-    border-bottom: 1px solid var(--card-border);
-  }
-  .modal-season-table td {
-    padding: 0.6rem 0.4rem;
-    border-bottom: 1px solid #1a3525;
-    color: var(--cinza-claro);
-  }
-  .modal-season-table td:first-child { color: var(--branco); font-weight: 600; }
-  .modal-season-table tr:last-child td { border-bottom: none; }
-  .pos-medal { font-size: 1rem; }
-  .trophy { color: var(--ouro); }
+/* ── MODAL ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:200; align-items:center; justify-content:center; padding:1rem; }
+.modal-overlay.open { display:flex; }
+.modal { background:#112b1c; border:1px solid var(--gold); border-radius:16px; width:100%; max-width:620px; max-height:85vh; overflow-y:auto; padding:1.5rem; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+.modal-close { position:absolute; top:1rem; right:1rem; background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer; }
+.modal-close:hover { color:var(--text); }
+.modal h2 { font-family:var(--font-head); font-size:1.5rem; color:var(--gold2); text-transform:uppercase; }
+.modal-sub { font-size:0.82rem; color:var(--muted); margin:0.2rem 0 1.25rem; }
+.modal-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin-bottom:1.5rem; }
+.ms { background:var(--card2); border-radius:8px; padding:0.75rem; text-align:center; border:1px solid var(--border); }
+.ms .v { font-family:var(--font-head); font-size:1.7rem; color:var(--gold2); line-height:1; }
+.ms .l { font-size:0.62rem; text-transform:uppercase; color:var(--muted); letter-spacing:0.06em; margin-top:0.2rem; }
+.modal table { width:100%; border-collapse:collapse; font-size:0.84rem; }
+.modal table th { text-align:left; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.08em; color:var(--gold); padding:0.5rem 0.4rem; border-bottom:1px solid var(--border); }
+.modal table td { padding:0.55rem 0.4rem; border-bottom:1px solid #172c1a; color:var(--muted2); }
+.modal table td:first-child { color:var(--text); font-weight:600; }
+.modal table tr:last-child td { border-bottom:none; }
 
-  /* FOOTER */
-  footer {
-    text-align: center;
-    padding: 2rem;
-    color: var(--cinza);
-    font-size: 0.75rem;
-    border-top: 1px solid var(--card-border);
-    margin-top: 3rem;
-  }
+/* ── FOOTER ── */
+footer { text-align:center; padding:2rem; color:var(--muted); font-size:0.72rem; border-top:1px solid var(--border); margin-top:3rem; }
 
-  /* CAPA HERO */
-  .capa-hero-wrap {
-    display: flex;
-    gap: 1.5rem;
-    align-items: flex-start;
-    background: var(--card-bg);
-    border: 1px solid var(--ouro);
-    border-radius: 14px;
-    padding: 1.25rem;
-    margin-bottom: 2rem;
-    overflow: hidden;
-  }
-  .capa-hero-img { flex-shrink: 0; width: 150px; border-radius: 8px; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,0.5); }
-  .capa-hero-img img { width: 100%; display: block; aspect-ratio: 3/4; object-fit: cover; }
-  .capa-hero-info { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 0.5rem; }
-  .capa-tag { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ouro); font-weight: 700; }
-  .capa-hero-date { font-size: 1rem; font-weight: 700; color: var(--branco); }
-  .capa-hero-link { font-size: 0.75rem; cursor: pointer; background: none; border: none; padding: 0; color: var(--cinza); text-decoration: underline; }
-  .capa-hero-link:hover { color: var(--branco); }
-
-  /* REPORT FORM */
-  .report-section { margin-top: 2.5rem; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; }
-  .report-header { background: #0a1f10; border-bottom: 2px solid var(--ouro); padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
-  .report-header h3 { font-size: 1rem; font-weight: 800; color: var(--ouro-claro); }
-  .server-status { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; }
-  .status-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-  .status-dot.online  { background: var(--vitoria); box-shadow: 0 0 6px var(--vitoria); }
-  .status-dot.offline { background: var(--derrota); }
-  .status-dot.checking{ background: var(--ouro); animation: pulse 1s infinite; }
-  .report-body { padding: 1.25rem; }
-  .report-date-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
-  .report-date-row label { font-size: 0.8rem; font-weight: 700; color: var(--cinza-claro); min-width: 70px; }
-  .report-date-row select { background: #0a1f10; color: var(--branco); border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.75rem; font-size: 0.85rem; cursor: pointer; }
-  .chips-section { margin-bottom: 1rem; }
-  .chips-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 0.5rem; }
-  .chips-label.v { color: var(--vitoria); }
-  .chips-label.d { color: var(--derrota); }
-  .chips-wrap { display: flex; flex-wrap: wrap; gap: 0.3rem; }
-  .chip { display: inline-flex; align-items: center; background: #0a1f10; border: 1px solid var(--card-border); border-radius: 20px; padding: 0.3rem 0.7rem; font-size: 0.8rem; cursor: pointer; user-select: none; transition: all 0.15s; }
-  .chip:hover { border-color: var(--cinza); }
-  .chip.sv { background: rgba(46,204,113,0.15); border-color: var(--vitoria); color: var(--vitoria); font-weight: 700; }
-  .chip.sd { background: rgba(231,76,60,0.15); border-color: var(--derrota); color: var(--derrota); font-weight: 700; }
-  .report-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; font-size: 0.82rem; }
-  .preview-box { background: #0a1f10; border-radius: 8px; padding: 0.75rem; min-height: 48px; }
-  .preview-box .plbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
-  .preview-box.pv .plbl { color: var(--vitoria); }
-  .preview-box.pd .plbl { color: var(--derrota); }
-  .preview-box .pnames { color: var(--cinza-claro); line-height: 1.6; }
-  .report-extras { margin-bottom: 1rem; }
-  .report-extras label { font-size: 0.75rem; color: var(--cinza); display: block; margin-bottom: 0.3rem; }
-  .report-extras input { width: 100%; background: #0a1f10; border: 1px solid var(--card-border); border-radius: 8px; padding: 0.45rem 0.75rem; color: var(--branco); font-size: 0.85rem; }
-  .report-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-  .report-submit { background: var(--ouro); color: #000; border: none; border-radius: 8px; padding: 0.65rem 1.5rem; font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: background 0.15s; }
-  .report-submit:hover { background: var(--ouro-claro); }
-  .report-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-  .report-msg { font-size: 0.82rem; flex: 1; }
-  .report-msg.success { color: var(--vitoria); }
-  .report-msg.error   { color: var(--derrota); }
-  .reload-btn { background: var(--verde-claro); color: #fff; border: none; border-radius: 6px; padding: 0.4rem 0.9rem; cursor: pointer; font-size: 0.8rem; font-weight: 700; }
-
-  /* JORNAIS */
-  .jornal-upload-area {
-    border: 2px dashed var(--verde-claro);
-    border-radius: 14px;
-    padding: 2.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: var(--card-bg);
-  }
-  .jornal-upload-area:hover, .jornal-upload-area.dragging {
-    border-color: var(--ouro);
-    background: #1a3525;
-  }
-  .jornal-upload-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
-  .jornal-upload-text { font-weight: 600; color: var(--branco); margin-bottom: 0.25rem; }
-  .jornal-upload-sub { font-size: 0.75rem; color: var(--cinza); }
-
-  .jornais-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.25rem;
-    margin-top: 0.75rem;
-  }
-  .jornais-empty {
-    text-align: center;
-    color: var(--cinza);
-    padding: 3rem;
-    font-size: 1rem;
-  }
-  .jornal-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    overflow: hidden;
-    transition: transform 0.15s;
-  }
-  .jornal-card:hover { transform: translateY(-3px); }
-  .jornal-img-wrap { position: relative; }
-  .jornal-img-wrap img {
-    width: 100%;
-    display: block;
-    aspect-ratio: 3/4;
-    object-fit: cover;
-  }
-  .jornal-delete {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    background: rgba(0,0,0,0.7);
-    border: none;
-    color: #fff;
-    border-radius: 50%;
-    width: 26px;
-    height: 26px;
-    cursor: pointer;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  .jornal-card:hover .jornal-delete { opacity: 1; }
-  .jornal-date {
-    padding: 0.5rem 0.75rem 0.4rem;
-    font-size: 0.75rem;
-    color: var(--cinza-claro);
-    font-weight: 600;
-  }
-  .jornal-caption {
-    padding: 0 0.75rem 0.5rem;
-    font-size: 0.72rem;
-    color: var(--cinza);
-    font-style: italic;
-  }
-
-  /* RESPONSIVE */
-  @media (max-width: 700px) {
-    .standings-table .hide-mobile { display: none; }
-    .alltime-grid { grid-template-columns: 1fr; }
-    .modal-stats-grid { grid-template-columns: repeat(3, 1fr); }
-    .form-badges { max-width: 140px; }
-  }
-
-  /* TRANSITIONS */
-  .fade-in {
-    animation: fadeIn 0.25s ease;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+/* ── RESPONSIVE ── */
+@media(max-width:680px){
+  .hm { display:none; }
+  .at-grid { grid-template-columns:1fr; }
+  .modal-stats { grid-template-columns:repeat(3,1fr); }
+  .preview-row { grid-template-columns:1fr; }
+  .capa-hero { flex-direction:column; }
+  .capa-hero-img { width:100%; max-height:200px; }
+}
 </style>
 </head>
 <body>
@@ -653,12 +292,10 @@
 <header>
   <div class="header-inner">
     <div class="logo">
-      <span class="logo-icon">⚽</span>
-      <div class="logo-text">
-        <h1>Retorta League</h1>
-      </div>
+      <div class="logo-badge">⚽</div>
+      <h1>Retorta League</h1>
     </div>
-    <div class="header-badge" id="current-badge">Época Atual</div>
+    <span class="live-badge" id="hdr-badge" style="display:none">Época Activa</span>
   </div>
 </header>
 
@@ -671,638 +308,421 @@
 </main>
 
 <div class="modal-overlay" id="modal-overlay">
-  <div class="modal" id="modal">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
-    <div id="modal-content"></div>
+    <div id="modal-body"></div>
   </div>
 </div>
 
-<footer>
-  Retorta League · Futebol de 5 · Todos os dados actualizados automaticamente a partir do ficheiro Excel
-</footer>
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close">✕</button>
+  <img class="lb-img" id="lb-img" src="" alt="">
+</div>
+
+<footer>Retorta League · Futebol de 5 · <a href="https://fcampos99.github.io/retorta-league/" style="color:var(--gold);text-decoration:none">fcampos99.github.io/retorta-league</a></footer>
 
 <script>
 const SEASONS = /* RETORTA_DATA_BEGIN */[{"id": "UCL_SS", "label": "Época de Verão · 1.ª Edição", "tipo": "Época de Verão", "edicao": "1.ª Edição", "ano": "2024", "inicio": "18/03/2024", "fim": "29/07/2024", "atual": false, "datas": ["18/03/2024", "25/03/2024", "01/04/2024", "08/04/2024", "15/04/2024", "22/04/2024", "29/04/2024", "06/05/2024", "13/05/2024", "20/05/2024", "27/05/2024", "03/06/2024", "10/06/2024", "17/06/2024", "24/06/2024", "03/07/2024", "08/07/2024", "22/07/2024", "29/07/2024"], "jogadores": [{"rank": 1, "nome": "João Capela", "alcunha": "Capela", "jogos": 19, "vitorias": 13, "derrotas": 6, "winRate": 0.6842, "mediaPonderada": 0.6842, "resultados": ["L", "W", "W", "W", "L", "W", "W", "W", "L", "W", "W", "W", "L", "L", "W", "L", "W", "W", "W"]}, {"rank": 2, "nome": "Pedro Vieira", "alcunha": "Vieira", "jogos": 18, "vitorias": 10, "derrotas": 8, "winRate": 0.5556, "mediaPonderada": 0.5263, "resultados": ["L", "L", null, "L", "L", "W", "W", "L", "W", "W", "W", "L", "W", "W", "W", "W", "L", "L", "W"]}, {"rank": 3, "nome": "Francisco Campos", "alcunha": "Campos", "jogos": 17, "vitorias": 9, "derrotas": 8, "winRate": 0.5294, "mediaPonderada": 0.4737, "resultados": ["W", "L", "L", "W", "L", "W", null, "L", "L", "W", "W", "L", "W", "W", null, "L", "W", "L", "W"]}, {"rank": 4, "nome": "José Miguel Ferreira", "alcunha": "Zé Miguel", "jogos": 13, "vitorias": 8, "derrotas": 5, "winRate": 0.6154, "mediaPonderada": 0.4211, "resultados": ["W", "L", "L", "L", null, "W", null, "L", "W", "W", "L", "W", null, "W", null, "W", "W", null, null]}, {"rank": 4, "nome": "Rui Dimas", "alcunha": "Dimas", "jogos": 16, "vitorias": 8, "derrotas": 8, "winRate": 0.5, "mediaPonderada": 0.4211, "resultados": [null, null, "W", "L", "L", "L", "W", "L", "W", "L", null, "L", "W", "W", "W", "W", "L", "W", "L"]}, {"rank": 4, "nome": "Joaquim Torrão", "alcunha": "Quim", "jogos": 19, "vitorias": 8, "derrotas": 11, "winRate": 0.4211, "mediaPonderada": 0.4211, "resultados": ["L", "W", "L", "W", "W", "W", "W", "L", "L", "L", "L", "W", "W", "L", "L", "L", "L", "L", "W"]}, {"rank": 7, "nome": "Eduardo Maia", "alcunha": "Edu", "jogos": 15, "vitorias": 7, "derrotas": 8, "winRate": 0.4667, "mediaPonderada": 0.3684, "resultados": ["L", "W", "L", "W", "W", null, "L", "W", "L", null, "W", "L", "L", "L", "L", "W", "W", null, null]}, {"rank": 8, "nome": "Francisco Santos", "alcunha": "Xico Santos", "jogos": 9, "vitorias": 6, "derrotas": 3, "winRate": 0.6667, "mediaPonderada": 0.3158, "resultados": ["W", "L", "W", "W", null, null, null, "W", "W", "W", "L", null, null, null, null, null, null, "L", null]}, {"rank": 9, "nome": "Rui Vaz", "alcunha": "Rui Vaz", "jogos": 9, "vitorias": 5, "derrotas": 4, "winRate": 0.5556, "mediaPonderada": 0.2632, "resultados": [null, null, null, null, "W", "L", "L", "W", "L", null, "W", "W", null, null, null, null, null, "W", "L"]}, {"rank": 10, "nome": "Guilherme Moura", "alcunha": "Gui Moura", "jogos": 8, "vitorias": 4, "derrotas": 4, "winRate": 0.5, "mediaPonderada": 0.2105, "resultados": [null, "W", null, null, "W", "L", "L", "W", null, "L", "L", "W", null, null, null, null, null, null, null]}, {"rank": 11, "nome": "João Santos", "alcunha": "Jorginho", "jogos": 4, "vitorias": 3, "derrotas": 1, "winRate": 0.75, "mediaPonderada": 0.1579, "resultados": ["W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "W", "W", "L"]}, {"rank": 11, "nome": "Diogo Azevedo", "alcunha": "Dipi", "jogos": 4, "vitorias": 3, "derrotas": 1, "winRate": 0.75, "mediaPonderada": 0.1579, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, "W", "W", "W", null, "L", null, null]}, {"rank": 11, "nome": "Tiago Filipe", "alcunha": "Tigas", "jogos": 12, "vitorias": 3, "derrotas": 9, "winRate": 0.25, "mediaPonderada": 0.1579, "resultados": ["L", "W", "W", null, null, "L", "L", null, null, "L", "L", "L", "L", "L", null, "L", null, null, "W"]}, {"rank": 14, "nome": "Diogo Duarte", "alcunha": "Insua", "jogos": 4, "vitorias": 2, "derrotas": 2, "winRate": 0.5, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, "L", null, "W", null, null, "W", "L"]}, {"rank": 14, "nome": "Dinis Pontes", "alcunha": "Trator", "jogos": 5, "vitorias": 2, "derrotas": 3, "winRate": 0.4, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, "W", null, null, null, null, null, "L", "L", null, "W", null, null, "L"]}, {"rank": 16, "nome": "André Amorim", "alcunha": "Bolinha", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": ["W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 16, "nome": "Ricardo Nunes", "alcunha": "Nunes", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 16, "nome": "António Moreira", "alcunha": "Toni Moreira", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, "W", null, null, null, null, null, null, null, null, null, null]}, {"rank": 16, "nome": "Pedro Miranda", "alcunha": "Miranda", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, "W", null, null, null, null, "L", null, null, null, null, null, null, null, null, null]}, {"rank": 20, "nome": "Bruno Silva", "alcunha": "Bruno", "jogos": 2, "vitorias": 0, "derrotas": 2, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, "L", null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 20, "nome": "João Órfão", "alcunha": "Órfão", "jogos": 3, "vitorias": 0, "derrotas": 3, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", "L", "L", null]}, {"rank": 20, "nome": "Peliteiro", "alcunha": "Peli", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 20, "nome": "Bruno Antunes", "alcunha": "Antunes", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 20, "nome": "Miguel Pacheco", "alcunha": "Mike", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 20, "nome": "Filipe Sá", "alcunha": "Sá", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 20, "nome": "Renato Pereira", "alcunha": "Renato", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 20, "nome": "Rúben Costa", "alcunha": "Rúben", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null]}, {"rank": 20, "nome": "João Ramos", "alcunha": "Cona Torta", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null]}, {"rank": 20, "nome": "Alexandre Silva", "alcunha": "Peixe", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null]}]}, {"id": "UCL_WS", "label": "Época de Inverno · 1.ª Edição", "tipo": "Época de Inverno", "edicao": "1.ª Edição", "ano": "2024-25", "inicio": "05/09/2024", "fim": "28/01/2025", "atual": false, "datas": ["05/09/2024", "16/09/2024", "23/09/2024", "30/09/2024", "07/10/2024", "14/10/2024", "21/10/2024", "28/10/2024", "04/11/2024", "11/11/2024", "19/11/2024", "25/11/2024", "03/12/2024", "09/12/2024", "17/12/2024", "06/01/2025", "13/01/2025", "20/01/2025", "28/01/2025"], "jogadores": [{"rank": 1, "nome": "João Capela", "alcunha": "Capela", "jogos": 18, "vitorias": 13, "derrotas": 5, "winRate": 0.7222, "mediaPonderada": 0.6842, "resultados": ["L", "W", "W", "W", null, "L", "L", "W", "W", "W", "W", "W", "L", "W", "W", "W", "W", "L", "W"]}, {"rank": 2, "nome": "Rodrigo Silva", "alcunha": "Rodrigo", "jogos": 16, "vitorias": 9, "derrotas": 7, "winRate": 0.5625, "mediaPonderada": 0.4737, "resultados": [null, "L", "W", "W", "L", "W", "W", "L", "W", "W", "W", "L", "L", "L", null, null, "W", "W", "L"]}, {"rank": 3, "nome": "Joaquim Torrão", "alcunha": "Quim", "jogos": 15, "vitorias": 8, "derrotas": 7, "winRate": 0.5333, "mediaPonderada": 0.4211, "resultados": [null, null, null, null, "W", "L", "L", "W", "L", "W", "W", "L", "W", "W", "L", "W", "W", "L", "L"]}, {"rank": 3, "nome": "Francisco Campos", "alcunha": "Campos", "jogos": 15, "vitorias": 8, "derrotas": 7, "winRate": 0.5333, "mediaPonderada": 0.4211, "resultados": ["L", "L", null, "W", "W", "W", null, null, "L", "W", null, "L", "L", "W", "L", "W", "W", "W", "L"]}, {"rank": 5, "nome": "Francisco Santos", "alcunha": "Xico Santos", "jogos": 11, "vitorias": 7, "derrotas": 4, "winRate": 0.6364, "mediaPonderada": 0.3684, "resultados": ["W", "W", "L", "W", "L", null, null, "W", null, null, null, null, "W", "W", "L", null, "L", null, "W"]}, {"rank": 5, "nome": "Simão Mendes", "alcunha": "Simão", "jogos": 13, "vitorias": 7, "derrotas": 6, "winRate": 0.5385, "mediaPonderada": 0.3684, "resultados": [null, null, "W", "L", "W", null, "W", "L", "L", null, "L", "W", "W", "L", null, null, "L", "W", "W"]}, {"rank": 7, "nome": "João Silva", "alcunha": "Alex", "jogos": 15, "vitorias": 6, "derrotas": 9, "winRate": 0.4, "mediaPonderada": 0.3158, "resultados": [null, "L", "L", "W", "L", null, "W", "L", "W", "L", "W", "W", "L", "L", null, null, "L", "W", "L"]}, {"rank": 7, "nome": "Pedro Vieira", "alcunha": "Vieira", "jogos": 12, "vitorias": 6, "derrotas": 6, "winRate": 0.5, "mediaPonderada": 0.3158, "resultados": ["W", "L", null, "L", "L", "W", "L", "W", "W", "L", "L", null, "W", null, "W", null, null, null, null]}, {"rank": 9, "nome": "Renato Pereira", "alcunha": "Renato", "jogos": 9, "vitorias": 4, "derrotas": 5, "winRate": 0.4444, "mediaPonderada": 0.2105, "resultados": [null, null, null, null, null, "L", "W", null, "W", null, null, "L", null, "W", "L", "L", null, "L", "W"]}, {"rank": 10, "nome": "Guilherme Moura", "alcunha": "Gui Moura", "jogos": 8, "vitorias": 3, "derrotas": 5, "winRate": 0.375, "mediaPonderada": 0.1579, "resultados": [null, null, null, null, null, "L", "L", null, "L", null, null, null, "W", null, "W", "L", "W", "L", null]}, {"rank": 10, "nome": "Rui Vaz", "alcunha": "Rui Vaz", "jogos": 8, "vitorias": 3, "derrotas": 5, "winRate": 0.375, "mediaPonderada": 0.1579, "resultados": [null, "W", null, "L", "W", null, null, "L", null, "L", null, "L", null, null, "L", "W", null, null, null]}, {"rank": 10, "nome": "João Santos", "alcunha": "Jorginho", "jogos": 7, "vitorias": 3, "derrotas": 4, "winRate": 0.4286, "mediaPonderada": 0.1579, "resultados": ["L", null, null, "L", null, "W", null, "L", "L", "W", null, "W", null, null, null, null, null, null, null]}, {"rank": 13, "nome": "Francisco Sá", "alcunha": "Xico Sá", "jogos": 5, "vitorias": 2, "derrotas": 3, "winRate": 0.4, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, "W", null, null, "L", "L", null, "L", null, "W", null, null, null, null]}, {"rank": 13, "nome": "Francisco Fonte", "alcunha": "Fonte", "jogos": 5, "vitorias": 2, "derrotas": 3, "winRate": 0.4, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, null, null, null, "L", null, "W", null, null, null, null, "L", "W", "L"]}, {"rank": 13, "nome": "Rui Dimas", "alcunha": "Dimas", "jogos": 4, "vitorias": 2, "derrotas": 2, "winRate": 0.5, "mediaPonderada": 0.1053, "resultados": [null, "L", null, null, "W", "W", "L", null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 13, "nome": "Diogo Duarte", "alcunha": "Insua", "jogos": 3, "vitorias": 2, "derrotas": 1, "winRate": 0.6667, "mediaPonderada": 0.1053, "resultados": ["L", "W", "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 13, "nome": "Filipe Gomes", "alcunha": "Mini", "jogos": 3, "vitorias": 2, "derrotas": 1, "winRate": 0.6667, "mediaPonderada": 0.1053, "resultados": ["W", null, "L", null, null, null, null, null, null, null, null, null, null, null, "W", null, null, null, null]}, {"rank": 18, "nome": "Rosa", "alcunha": "Rosa", "jogos": 3, "vitorias": 1, "derrotas": 2, "winRate": 0.3333, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, "L", "W"]}, {"rank": 18, "nome": "Daniel Marafona", "alcunha": "Mara", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, "W", null, null, null, null, null, "L", null, null, null, null, null]}, {"rank": 18, "nome": "José Miguel Ferreira", "alcunha": "Zé Miguel", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, "W", null, null, null]}, {"rank": 18, "nome": "Ricardo Miranda", "alcunha": "Miranda Sr.", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": ["W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 18, "nome": "Bruno Silva", "alcunha": "Bruno", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 18, "nome": "João Cruz", "alcunha": "Cruz", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 18, "nome": "André Ferreira", "alcunha": "Ferreira", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, "W", null, null, null, null, null, null, null, null]}, {"rank": 26, "nome": "Fernando", "alcunha": "Nando", "jogos": 3, "vitorias": 0, "derrotas": 3, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, "L", "L", "L", null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 26, "nome": "José Costa", "alcunha": "Paralelo", "jogos": 2, "vitorias": 0, "derrotas": 2, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null, "L", null, null]}, {"rank": 26, "nome": "Guilherme Macedo", "alcunha": "Macedo", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": ["L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 26, "nome": "Raul Trocado", "alcunha": "Trocado", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 26, "nome": "Tiago Lima", "alcunha": "Lima", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 26, "nome": "Diogo Souto", "alcunha": "Souto", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null]}, {"rank": 26, "nome": "Francisco Silva", "alcunha": "Xico Silva", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null]}, {"rank": 26, "nome": "Bruno Maia", "alcunha": "Maia", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null]}]}, {"id": "UCL_SS_2ed", "label": "Época de Verão · 2.ª Edição", "tipo": "Época de Verão", "edicao": "2.ª Edição", "ano": "2025", "inicio": "06/03/2025", "fim": "07/07/2025", "atual": false, "datas": ["06/03/2025", "13/03/2025", "17/03/2025", "24/03/2025", "31/03/2025", "07/04/2025", "14/04/2025", "21/04/2025", "29/04/2025", "05/05/2025", "12/05/2025", "19/05/2025", "26/05/2025", "05/06/2025", "11/06/2025", "16/06/2025", "26/06/2025", "30/06/2025", "07/07/2025"], "jogadores": [{"rank": 1, "nome": "Joaquim Torrão", "alcunha": "Quim", "jogos": 19, "vitorias": 12, "derrotas": 7, "winRate": 0.6316, "mediaPonderada": 0.6316, "resultados": ["W", "W", "W", "L", "L", "W", "L", "L", "W", "L", "W", "W", "W", "W", "L", "W", "L", "W", "W"]}, {"rank": 2, "nome": "João Capela", "alcunha": "Capela", "jogos": 18, "vitorias": 9, "derrotas": 9, "winRate": 0.5, "mediaPonderada": 0.4737, "resultados": ["W", "L", "L", "W", "W", null, "L", "L", "W", "L", "W", "W", "W", "L", "W", "L", "W", "L", "L"]}, {"rank": 3, "nome": "Renato Pereira", "alcunha": "Renato", "jogos": 12, "vitorias": 7, "derrotas": 5, "winRate": 0.5833, "mediaPonderada": 0.3684, "resultados": ["L", "W", "W", "L", "W", "L", "W", "W", "L", "W", null, "W", "L", null, null, null, null, null, null]}, {"rank": 4, "nome": "Pedro Vieira", "alcunha": "Vieira", "jogos": 12, "vitorias": 6, "derrotas": 6, "winRate": 0.5, "mediaPonderada": 0.3158, "resultados": [null, "L", "L", null, "W", "L", "L", "W", null, null, "L", "L", "W", null, null, null, "W", "W", "W"]}, {"rank": 5, "nome": "Simão Mendes", "alcunha": "Simão", "jogos": 7, "vitorias": 5, "derrotas": 2, "winRate": 0.7143, "mediaPonderada": 0.2632, "resultados": [null, null, "W", null, "L", "W", null, "W", null, "W", "L", "W", null, null, null, null, null, null, null]}, {"rank": 5, "nome": "Francisco Campos", "alcunha": "Campos", "jogos": 9, "vitorias": 5, "derrotas": 4, "winRate": 0.5556, "mediaPonderada": 0.2632, "resultados": [null, null, null, "W", null, "W", "W", "L", null, null, null, null, "L", "W", null, null, "W", "L", "L"]}, {"rank": 5, "nome": "Dinis Pontes", "alcunha": "Trator", "jogos": 9, "vitorias": 5, "derrotas": 4, "winRate": 0.5556, "mediaPonderada": 0.2632, "resultados": [null, null, null, null, null, null, null, null, null, null, "L", "L", "W", "W", "L", "W", "L", "W", "W"]}, {"rank": 8, "nome": "Diogo Souto", "alcunha": "Souto", "jogos": 6, "vitorias": 4, "derrotas": 2, "winRate": 0.6667, "mediaPonderada": 0.2105, "resultados": [null, null, null, null, null, null, null, null, "W", "W", "W", "W", "L", null, null, null, null, "L", null]}, {"rank": 8, "nome": "João Silva", "alcunha": "Alex", "jogos": 9, "vitorias": 4, "derrotas": 5, "winRate": 0.4444, "mediaPonderada": 0.2105, "resultados": [null, null, "W", "L", null, "L", null, "W", null, "L", "W", null, "L", null, "L", null, null, "W", null]}, {"rank": 10, "nome": "Francisco Fonte", "alcunha": "Fonte", "jogos": 4, "vitorias": 3, "derrotas": 1, "winRate": 0.75, "mediaPonderada": 0.1579, "resultados": [null, null, "W", "W", null, "L", null, "W", null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 10, "nome": "Rosa", "alcunha": "Rosa", "jogos": 6, "vitorias": 3, "derrotas": 3, "winRate": 0.5, "mediaPonderada": 0.1579, "resultados": ["L", "L", null, null, null, "W", "W", null, "L", "W", null, null, null, null, null, null, null, null, null]}, {"rank": 10, "nome": "Raul Trocado", "alcunha": "Trocado", "jogos": 3, "vitorias": 3, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.1579, "resultados": ["W", null, null, null, "W", null, null, null, null, null, null, null, null, null, null, null, "W", null, null]}, {"rank": 13, "nome": "Guilherme Moura", "alcunha": "Gui Moura", "jogos": 11, "vitorias": 2, "derrotas": 9, "winRate": 0.1818, "mediaPonderada": 0.1053, "resultados": ["L", "L", "L", "L", "W", "L", "W", "L", "L", null, null, null, "L", null, null, null, null, "L", null]}, {"rank": 13, "nome": "Diogo Duarte", "alcunha": "Insua", "jogos": 7, "vitorias": 2, "derrotas": 5, "winRate": 0.2857, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, null, null, "L", "L", "W", "L", "W", "L", "L", null, null, null, null]}, {"rank": 13, "nome": "Rodrigo Silva", "alcunha": "Rodrigo", "jogos": 4, "vitorias": 2, "derrotas": 2, "winRate": 0.5, "mediaPonderada": 0.1053, "resultados": [null, null, null, "L", null, "W", null, "L", null, null, null, null, null, null, "W", null, null, null, null]}, {"rank": 13, "nome": "Pedro Gomes", "alcunha": "Jonas", "jogos": 3, "vitorias": 2, "derrotas": 1, "winRate": 0.6667, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, "L", null, null, null, null, null, null, "W", "W", null, null, null, null]}, {"rank": 13, "nome": "João Órfão", "alcunha": "Órfão", "jogos": 4, "vitorias": 2, "derrotas": 2, "winRate": 0.5, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, "L", "W", "W", null, null, "L"]}, {"rank": 13, "nome": "Gonçalo Fernandes", "alcunha": "Gonças", "jogos": 2, "vitorias": 2, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "W", "W", null, null]}, {"rank": 19, "nome": "José Miguel Ferreira", "alcunha": "Zé Miguel", "jogos": 3, "vitorias": 1, "derrotas": 2, "winRate": 0.3333, "mediaPonderada": 0.0526, "resultados": ["L", null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null]}, {"rank": 19, "nome": "João Santos", "alcunha": "Jorginho", "jogos": 3, "vitorias": 1, "derrotas": 2, "winRate": 0.3333, "mediaPonderada": 0.0526, "resultados": [null, "W", null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, "L"]}, {"rank": 19, "nome": "Eduardo Maia", "alcunha": "Edu", "jogos": 4, "vitorias": 1, "derrotas": 3, "winRate": 0.25, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, "L", null, "W", "L"]}, {"rank": 19, "nome": "António Amorim", "alcunha": "Toni", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": ["W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 19, "nome": "Tiago Lima", "alcunha": "Lima", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": ["W", null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 19, "nome": "Rui Dimas", "alcunha": "Dimas", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, "W", null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null]}, {"rank": 19, "nome": "Tiago Filipe", "alcunha": "Tigas", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 19, "nome": "Adriano Pereira", "alcunha": "Adri", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 19, "nome": "Luís Guimarães", "alcunha": "Guimarães", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 19, "nome": "Francisco Santos", "alcunha": "Xico Santos", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, "W", null, null, null, null, null, null, null, null, null, null]}, {"rank": 19, "nome": "Daniel Marafona", "alcunha": "Mara", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, "W", null, null, null, null, null, null, null, null, null, null]}, {"rank": 19, "nome": "Paulo Ferreira", "alcunha": "Paulo", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, "L", "W", null, null, null, null, null, null, null, null, null]}, {"rank": 19, "nome": "José Domingos", "alcunha": "Zé Domingos", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, "W", null, null, null, null, null]}, {"rank": 19, "nome": "Leandro Terroso", "alcunha": "Zé Li", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, "W", "L", null, null, null]}, {"rank": 19, "nome": "João Ramos", "alcunha": "Cona Torta", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "W", "L", null, null]}, {"rank": 19, "nome": "Xavier Oliveira", "alcunha": "Xavi", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "W"]}, {"rank": 19, "nome": "Pedro Miranda", "alcunha": "Miranda", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, "W"]}, {"rank": 36, "nome": "Leonardo Domingos", "alcunha": "Leo", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": ["L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Diogo Castro", "alcunha": "Castro", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Diogo Azevedo", "alcunha": "Dipi", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Pedro Oliveira", "alcunha": "Pirussas", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Rui Vaz", "alcunha": "Rui Vaz", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Gonçalo Azevedo", "alcunha": "Gonçalo", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Tiago Capela", "alcunha": "Capela Jr", "jogos": 3, "vitorias": 0, "derrotas": 3, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, "L", null, null, "L", null, null, null, null, null, "L", null, null, null]}, {"rank": 36, "nome": "Hélder Morim", "alcunha": "Morim", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Abel Folha", "alcunha": "Folha", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Jó Silva", "alcunha": "Jó", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null]}, {"rank": 36, "nome": "António Pinto", "alcunha": "Pinto", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null, null, null, null]}, {"rank": 36, "nome": "Bruno Cunha", "alcunha": "Bruno Cunha", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null]}, {"rank": 36, "nome": "Diogo Moreira", "alcunha": "Moreira", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null]}]}, {"id": "UCL_WS_2ed", "label": "Época de Inverno · 2.ª Edição", "tipo": "Época de Inverno", "edicao": "2.ª Edição", "ano": "2025-26", "inicio": "08/09/2025", "fim": "19/01/2026", "atual": false, "datas": ["08/09/2025", "15/09/2025", "22/09/2025", "29/09/2025", "06/10/2025", "13/10/2025", "21/10/2025", "28/10/2025", "04/11/2025", "11/11/2025", "17/11/2025", "25/11/2025", "02/12/2025", "09/12/2025", "16/12/2025", "30/12/2025", "06/01/2026", "13/01/2026", "20/01/2026"], "jogadores": [{"rank": 1, "nome": "Joaquim Torrão", "alcunha": "Quim", "jogos": 18, "vitorias": 12, "derrotas": 6, "winRate": 0.6667, "mediaPonderada": 0.6316, "resultados": ["L", null, "L", "W", "W", "L", "W", "W", "W", "W", "L", "L", "W", "W", "W", "W", "W", "L", "W"]}, {"rank": 2, "nome": "João Capela", "alcunha": "Capela", "jogos": 18, "vitorias": 10, "derrotas": 8, "winRate": 0.5556, "mediaPonderada": 0.5263, "resultados": ["W", "L", "W", "W", "W", "L", "W", "L", "L", "W", "L", "W", null, "W", "L", "L", "L", "W", "W"]}, {"rank": 3, "nome": "Raul Trocado", "alcunha": "Trocado", "jogos": 12, "vitorias": 9, "derrotas": 3, "winRate": 0.75, "mediaPonderada": 0.4737, "resultados": [null, null, null, null, null, null, "L", "L", "W", "W", "W", null, "W", "L", "W", "W", "W", "W", "W"]}, {"rank": 4, "nome": "Francisco Campos", "alcunha": "Campos", "jogos": 14, "vitorias": 8, "derrotas": 6, "winRate": 0.5714, "mediaPonderada": 0.4211, "resultados": ["L", "W", null, null, null, null, null, "L", "W", "W", "L", "W", "W", "L", "W", "W", "L", "W", "L"]}, {"rank": 5, "nome": "Guilherme Moura", "alcunha": "Gui Moura", "jogos": 14, "vitorias": 6, "derrotas": 8, "winRate": 0.4286, "mediaPonderada": 0.3158, "resultados": [null, "W", null, "L", "W", "W", "L", null, null, "L", "W", "W", null, "W", "L", "L", "L", "L", "L"]}, {"rank": 6, "nome": "Eduardo Maia", "alcunha": "Edu", "jogos": 17, "vitorias": 6, "derrotas": 11, "winRate": 0.3529, "mediaPonderada": 0.3158, "resultados": ["W", "W", null, "L", "L", "L", "W", "L", "L", "L", "L", "L", "L", "W", "L", null, "W", "W", "L"]}, {"rank": 7, "nome": "Diogo Canito", "alcunha": "Canito", "jogos": 5, "vitorias": 5, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.2632, "resultados": [null, null, "W", "W", "W", null, null, "W", null, null, null, null, "W", null, null, null, null, null, null]}, {"rank": 8, "nome": "Renato Pereira", "alcunha": "Renato", "jogos": 12, "vitorias": 5, "derrotas": 7, "winRate": 0.4167, "mediaPonderada": 0.2632, "resultados": [null, "W", null, null, null, null, "L", null, null, "L", "W", "W", "L", "W", "L", "W", "L", "L", "L"]}, {"rank": 9, "nome": "Leandro Terroso", "alcunha": "Zé Li", "jogos": 5, "vitorias": 4, "derrotas": 1, "winRate": 0.8, "mediaPonderada": 0.2105, "resultados": [null, null, null, "W", "W", null, null, "W", null, null, null, null, null, null, "W", "L", null, null, null]}, {"rank": 10, "nome": "Pedro Vieira", "alcunha": "Vieira", "jogos": 7, "vitorias": 4, "derrotas": 3, "winRate": 0.5714, "mediaPonderada": 0.2105, "resultados": ["W", null, null, null, "L", null, "L", null, null, null, null, "L", null, null, null, null, "W", "W", "W"]}, {"rank": 11, "nome": "José Miguel Ferreira", "alcunha": "Zé Miguel", "jogos": 11, "vitorias": 4, "derrotas": 7, "winRate": 0.3636, "mediaPonderada": 0.2105, "resultados": [null, "L", null, "W", "L", "W", null, "L", null, "L", "W", "L", "L", null, "W", null, null, "L", null]}, {"rank": 12, "nome": "Gonçalo Silva", "alcunha": "Anke", "jogos": 4, "vitorias": 3, "derrotas": 1, "winRate": 0.75, "mediaPonderada": 0.1579, "resultados": [null, null, null, null, null, null, null, "W", "W", null, null, null, "W", "L", null, null, null, null, null]}, {"rank": 13, "nome": "Rui Vaz", "alcunha": "Rui Vaz", "jogos": 3, "vitorias": 2, "derrotas": 1, "winRate": 0.6667, "mediaPonderada": 0.1053, "resultados": [null, null, null, null, null, null, "L", "W", "W", null, null, null, null, null, null, null, null, null, null]}, {"rank": 14, "nome": "João Alex Silva", "alcunha": "Alex", "jogos": 4, "vitorias": 2, "derrotas": 2, "winRate": 0.5, "mediaPonderada": 0.1053, "resultados": [null, "W", null, null, null, "L", null, null, null, null, "W", "L", null, null, null, null, null, null, null]}, {"rank": 15, "nome": "Rodrigo Silva", "alcunha": "Rodrigo", "jogos": 5, "vitorias": 2, "derrotas": 3, "winRate": 0.4, "mediaPonderada": 0.1053, "resultados": [null, "L", null, null, null, "W", null, null, null, null, "L", "W", null, null, null, null, null, null, "L"]}, {"rank": 16, "nome": "Ricardo Campos", "alcunha": "Ricardo Campos", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": ["W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 16, "nome": "Tiago Capela", "alcunha": "Capela Jr", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 16, "nome": "Carlos Sousa", "alcunha": "Carlinhos", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 16, "nome": "Rodrigo Lima", "alcunha": "Rodri Lima", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 16, "nome": "Rui Dimas", "alcunha": "Dimas", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 16, "nome": "Simão Mendes", "alcunha": "Simão", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "W", null, null]}, {"rank": 22, "nome": "Diogo Azevedo", "alcunha": "Dipi", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": ["W", "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 22, "nome": "Bruno Cunha", "alcunha": "Bruno Cunha", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0526, "resultados": [null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, "W"]}, {"rank": 24, "nome": "Diogo Castro", "alcunha": "Castro", "jogos": 3, "vitorias": 1, "derrotas": 2, "winRate": 0.3333, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, "W", null, null, null, null, null, null, "L", null, "L", null, null, null]}, {"rank": 25, "nome": "Tiago Filipe", "alcunha": "Tigas", "jogos": 4, "vitorias": 1, "derrotas": 3, "winRate": 0.25, "mediaPonderada": 0.0526, "resultados": [null, null, "L", "L", "L", "W", null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 25, "nome": "Tiago Cabreira", "alcunha": "Cabreira", "jogos": 4, "vitorias": 1, "derrotas": 3, "winRate": 0.25, "mediaPonderada": 0.0526, "resultados": [null, null, null, null, null, null, null, null, "L", "W", null, null, "L", null, "L", null, null, null, null]}, {"rank": 25, "nome": "Diogo Souto", "alcunha": "Souto", "jogos": 4, "vitorias": 1, "derrotas": 3, "winRate": 0.25, "mediaPonderada": 0.0526, "resultados": ["L", null, "L", null, null, null, null, null, null, null, null, null, null, null, null, "W", null, "L", null]}, {"rank": 28, "nome": "António Pinto", "alcunha": "Pinto", "jogos": 5, "vitorias": 1, "derrotas": 4, "winRate": 0.2, "mediaPonderada": 0.0526, "resultados": [null, null, null, "L", null, "L", "W", null, "L", "L", null, null, null, null, null, null, null, null, null]}, {"rank": 29, "nome": "Marco Miguel", "alcunha": "Marquinho", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null]}, {"rank": 29, "nome": "Leonardo Domingos", "alcunha": "Leo", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": ["L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 29, "nome": "Ricardo Nunes", "alcunha": "Nunes", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null, null]}, {"rank": 29, "nome": "Francisco Santos", "alcunha": "Xico Santos", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 29, "nome": "Guilherme Macedo", "alcunha": "Macedo", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, "L", null, null]}, {"rank": 34, "nome": "Pedro Gomes", "alcunha": "Jonas", "jogos": 2, "vitorias": 0, "derrotas": 2, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, "L", null, null, null, "L", null, null, null, null, null, null]}, {"rank": 35, "nome": "Diogo Duarte", "alcunha": "Insua", "jogos": 4, "vitorias": 0, "derrotas": 4, "winRate": 0.0, "mediaPonderada": 0, "resultados": ["L", "L", "L", null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null]}]}, {"id": "UCL_SS_3ed", "label": "Época de Verão · 3.ª Edição", "tipo": "Época de Verão", "edicao": "3.ª Edição", "ano": "2026", "inicio": "10/03/2026", "fim": "14/07/2026", "atual": true, "datas": ["10/03/2026", "17/03/2026", "24/03/2026", "31/03/2026", "07/04/2026", "14/04/2026", "21/04/2026", "28/04/2026", "05/05/2026", "12/05/2026", "19/05/2026", "26/05/2026", "02/06/2026", "09/06/2026", "16/06/2026", "23/06/2026", "30/06/2026", "07/07/2026", "14/07/2026"], "jogadores": [{"rank": 1, "nome": "Francisco Campos", "alcunha": "Campos", "jogos": 8, "vitorias": 7, "derrotas": 1, "winRate": 0.875, "mediaPonderada": 0.5833, "resultados": [null, null, null, "W", "W", "W", "W", "L", "W", "W", null, "W", null, null, null, null, null, null, null]}, {"rank": 2, "nome": "Rodrigo Silva", "alcunha": "Rodrigo", "jogos": 10, "vitorias": 7, "derrotas": 3, "winRate": 0.7, "mediaPonderada": 0.5833, "resultados": ["L", "L", "W", "L", "W", "W", "W", "W", "W", null, null, "W", null, null, null, null, null, null, null]}, {"rank": 3, "nome": "João Capela", "alcunha": "Capela", "jogos": 11, "vitorias": 7, "derrotas": 4, "winRate": 0.6364, "mediaPonderada": 0.5833, "resultados": ["W", "W", "L", "W", "W", "L", "W", null, "L", "W", "W", "L", null, null, null, null, null, null, null]}, {"rank": 4, "nome": "Raul Trocado", "alcunha": "Trocado", "jogos": 11, "vitorias": 6, "derrotas": 5, "winRate": 0.5455, "mediaPonderada": 0.5, "resultados": [null, "W", "L", "W", "L", "L", "W", "W", "L", "W", "W", "L", null, null, null, null, null, null, null]}, {"rank": 5, "nome": "João Santos", "alcunha": "Jorginho", "jogos": 7, "vitorias": 5, "derrotas": 2, "winRate": 0.7143, "mediaPonderada": 0.4167, "resultados": ["W", null, null, null, null, "W", "W", "W", null, "L", "W", "L", null, null, null, null, null, null, null]}, {"rank": 6, "nome": "José Miguel Ferreira", "alcunha": "Zé Miguel", "jogos": 9, "vitorias": 5, "derrotas": 4, "winRate": 0.5556, "mediaPonderada": 0.4167, "resultados": [null, null, "W", "W", null, "L", "L", "L", "W", "W", "L", "W", null, null, null, null, null, null, null]}, {"rank": 7, "nome": "Joaquim Torrão", "alcunha": "Quim", "jogos": 10, "vitorias": 4, "derrotas": 6, "winRate": 0.4, "mediaPonderada": 0.3333, "resultados": ["L", "W", "L", "L", "L", "L", "L", "W", "W", null, null, "W", null, null, null, null, null, null, null]}, {"rank": 8, "nome": "Renato Pereira", "alcunha": "Renato", "jogos": 11, "vitorias": 4, "derrotas": 7, "winRate": 0.3636, "mediaPonderada": 0.3333, "resultados": ["W", "L", "W", "L", null, "W", "L", "L", "L", "L", "W", "L", null, null, null, null, null, null, null]}, {"rank": 9, "nome": "Pedro Vieira", "alcunha": "Vieira", "jogos": 8, "vitorias": 3, "derrotas": 5, "winRate": 0.375, "mediaPonderada": 0.25, "resultados": ["W", "W", null, "L", "L", null, "L", "W", "L", null, "L", null, null, null, null, null, null, null, null]}, {"rank": 10, "nome": "Guilherme Moura", "alcunha": "Gui Moura", "jogos": 9, "vitorias": 3, "derrotas": 6, "winRate": 0.3333, "mediaPonderada": 0.25, "resultados": ["L", "L", "W", "L", "L", "W", "L", null, "W", "L", null, null, null, null, null, null, null, null, null]}, {"rank": 11, "nome": "João Órfão", "alcunha": "Órfão", "jogos": 4, "vitorias": 2, "derrotas": 2, "winRate": 0.5, "mediaPonderada": 0.1667, "resultados": [null, null, null, null, null, null, null, "L", null, "W", "L", "W", null, null, null, null, null, null, null]}, {"rank": 12, "nome": "Eduardo Maia", "alcunha": "Edu", "jogos": 9, "vitorias": 2, "derrotas": 7, "winRate": 0.2222, "mediaPonderada": 0.1667, "resultados": [null, "L", null, "W", "W", "L", null, "L", "L", "L", "L", "L", null, null, null, null, null, null, null]}, {"rank": 13, "nome": "Diogo Castro", "alcunha": "Castro", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0833, "resultados": [null, null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 13, "nome": "Vítor Leite", "alcunha": "Vítor", "jogos": 1, "vitorias": 1, "derrotas": 0, "winRate": 1.0, "mediaPonderada": 0.0833, "resultados": [null, null, null, null, null, null, null, null, null, null, "W", null, null, null, null, null, null, null, null]}, {"rank": 15, "nome": "Diogo Souto", "alcunha": "Souto", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0833, "resultados": ["W", null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 15, "nome": "João Silva", "alcunha": "Alex", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0833, "resultados": ["L", "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 15, "nome": "Gonçalo Silva", "alcunha": "Anke", "jogos": 2, "vitorias": 1, "derrotas": 1, "winRate": 0.5, "mediaPonderada": 0.0833, "resultados": [null, null, "L", null, "W", null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 18, "nome": "Martim Pereira", "alcunha": "Martim", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 18, "nome": "Jorge Rajão", "alcunha": "Rajão", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, "L", null, null, null, null, null, null, null, null, null, null, null, null, null, null]}, {"rank": 18, "nome": "Dinis Pontes", "alcunha": "Trator", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null, null, null, null, null]}, {"rank": 18, "nome": "Diogo Duarte", "alcunha": "Insua", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": [null, null, null, null, null, null, null, null, null, null, "L", null, null, null, null, null, null, null, null]}, {"rank": 18, "nome": "Leandro Terroso", "alcunha": "Zé Li", "jogos": 1, "vitorias": 0, "derrotas": 1, "winRate": 0.0, "mediaPonderada": 0, "resultados": ["L", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]}]}]/* RETORTA_DATA_END */;
+const CAPAS   = /* CAPAS_DATA_BEGIN */[]/* CAPAS_DATA_END */;
 
-let activeSeason = SEASONS.find(s => s.atual)?.id || SEASONS[SEASONS.length - 1].id;
-let activeTab = activeSeason;
+let activeTab = (SEASONS.find(s => s.atual) || SEASONS[SEASONS.length-1]).id;
 
-function medal(pos) {
-  if (pos === 1) return '🥇';
-  if (pos === 2) return '🥈';
-  if (pos === 3) return '🥉';
-  return '';
-}
-
+/* ── TABS ── */
 function renderTabs() {
-  const container = document.getElementById('season-tabs');
-  container.innerHTML = '';
+  const c = document.getElementById('season-tabs');
+  c.innerHTML = '';
   SEASONS.forEach(s => {
-    const btn = document.createElement('button');
-    btn.className = 'tab-btn' + (s.id === activeTab ? ' active' : '');
-    btn.textContent = s.label;
+    const b = document.createElement('button');
+    b.className = 'tab-btn' + (s.id === activeTab ? ' active' : '');
+    b.textContent = s.label;
     if (s.atual) {
-      const badge = document.createElement('span');
-      badge.className = 'tab-badge';
-      badge.textContent = 'AO VIVO';
-      btn.appendChild(badge);
+      const sp = document.createElement('span');
+      sp.className = 'tab-live'; sp.textContent = 'AO VIVO';
+      b.appendChild(sp);
+      document.getElementById('hdr-badge').style.display = '';
     }
-    btn.onclick = () => switchTab(s.id);
-    container.appendChild(btn);
+    b.onclick = () => switchTab(s.id);
+    c.appendChild(b);
   });
-  // All-time tab
-  const btn = document.createElement('button');
-  btn.className = 'tab-btn' + (activeTab === 'alltime' ? ' active' : '');
-  btn.textContent = 'Histórico Total';
-  btn.onclick = () => switchTab('alltime');
-  container.appendChild(btn);
-  // Jornais tab
-  const btn2 = document.createElement('button');
-  btn2.className = 'tab-btn' + (activeTab === 'jornais' ? ' active' : '');
-  btn2.textContent = '📰 Capas de Jornais';
-  btn2.onclick = () => switchTab('jornais');
-  container.appendChild(btn2);
+  ['alltime','capas'].forEach((id,i) => {
+    const b = document.createElement('button');
+    b.className = 'tab-btn' + (activeTab === id ? ' active' : '');
+    b.textContent = id === 'alltime' ? 'Histórico Total' : '📰 Capas de Jornais';
+    b.onclick = () => switchTab(id);
+    c.appendChild(b);
+  });
 }
 
 function switchTab(id) {
   activeTab = id;
   renderTabs();
-  const content = document.getElementById('content');
-  content.classList.remove('fade-in');
-  void content.offsetWidth;
-  content.classList.add('fade-in');
-  if (id === 'alltime') {
-    renderAllTime();
-  } else if (id === 'jornais') {
-    renderJornais();
-  } else {
-    renderSeason(SEASONS.find(s => s.id === id));
-  }
+  const el = document.getElementById('content');
+  el.classList.remove('fade-in'); void el.offsetWidth; el.classList.add('fade-in');
+  if (id === 'alltime') renderAllTime();
+  else if (id === 'capas') renderCapas();
+  else renderSeason(SEASONS.find(s => s.id === id));
 }
 
-function renderSeason(season) {
-  const players = season.jogadores;
-  const totalJornadas = season.datas.length;
-  const totalJogadores = players.length;
-  const current = season.atual ? '<span class="header-badge" style="font-size:0.7rem;padding:0.2rem 0.6rem">Época Actual</span>' : '';
+/* ── HELPERS ── */
+function pct(n){ return Math.round(n*100); }
+function medal(r){ return r===1?'p1':r===2?'p2':r===3?'p3':'pn'; }
+function initials(nome){ return nome.split(' ').filter((_,i,a)=>i===0||i===a.length-1).map(w=>w[0]).join('').toUpperCase(); }
+function wrColor(wr){ return wr>=60?'var(--green)':wr>=50?'var(--gold2)':'var(--red)'; }
+function formatDate(iso) {
+  const d = new Date(iso);
+  const M = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  return `${d.getDate()} de ${M[d.getMonth()]} de ${d.getFullYear()}`;
+}
 
-  // Get recent form (last 5 games each player played)
-  function recentForm(resultados) {
-    const played = resultados.filter(r => r === 'W' || r === 'L');
-    return played.slice(-5);
+/* ── SEASON ── */
+function renderSeason(season) {
+  const ps = season.jogadores;
+
+  // Capa hero
+  let capaHtml = '';
+  if (season.atual) {
+    const latest = CAPAS.length ? CAPAS[CAPAS.length-1] : null;
+    if (latest) {
+      const src = latest.filename ? `capas/${latest.filename}` : latest.src;
+      capaHtml = `<div class="capa-hero">
+        <div class="capa-hero-img"><img src="${src}" alt="Capa"></div>
+        <div class="capa-hero-body">
+          <div class="capa-hero-tag">📰 Última Capa de Jornal</div>
+          <div class="capa-hero-date">${formatDate(latest.date)}</div>
+          <button class="capa-hero-link" onclick="switchTab('capas')">Ver arquivo →</button>
+        </div>
+      </div>`;
+    }
   }
 
-  const rows = players.map(p => {
-    const posCls = p.rank <= 3 ? `pos-${p.rank}` : 'pos-other';
-    const posHtml = `<span class="pos-badge ${posCls}">${p.rank}</span>`;
-    const wr = Math.round(p.winRate * 100);
-    const barW = Math.min(wr, 100);
-    const wrColor = wr >= 60 ? '#2ecc71' : wr >= 50 ? '#f0c040' : '#e74c3c';
-    const form = recentForm(p.resultados);
-    const formHtml = form.map(r => `<span class="form-${r.toLowerCase()}">${r}</span>`).join('');
-    const mediaColor = p.mediaPonderada >= 0.5 ? '#2ecc71' : p.mediaPonderada >= 0.35 ? '#f0c040' : '#e74c3c';
-    const allForm = p.resultados.map((r, i) => {
-      if (r === 'W') return `<span class="form-w">V</span>`;
-      if (r === 'L') return `<span class="form-l">D</span>`;
-      return `<span class="form-a"></span>`;
-    }).join('');
+  // Stats
+  const played = season.datas.filter((_,i)=>ps.some(p=>p.resultados[i]!==null)).length;
+  const topWR  = [...ps].filter(p=>p.jogos>=5).sort((a,b)=>b.winRate-a.winRate)[0];
 
-    return `<tr onclick="openPlayerModal('${p.nome}')">
-      <td class="num">${posHtml}</td>
-      <td>
-        <div class="player-name">${p.nome}</div>
-        <div class="player-nick">${p.alcunha}</div>
-      </td>
-      <td class="num">${p.jogos}</td>
-      <td class="num" style="color:var(--vitoria);font-weight:700">${p.vitorias}</td>
-      <td class="num hide-mobile" style="color:var(--derrota);font-weight:700">${p.derrotas}</td>
-      <td class="hide-mobile">
-        <div class="win-rate-bar">
-          <div class="bar-track"><div class="bar-fill" style="width:${barW}%;background:${wrColor}"></div></div>
-          <span class="wr-text" style="color:${wrColor}">${wr}%</span>
-        </div>
-      </td>
-      <td class="hide-mobile"><div class="form-badges">${formHtml}</div></td>
-      <td class="num"><span class="media-val" style="color:${mediaColor}">${p.mediaPonderada.toFixed(3)}</span></td>
+  // Table rows
+  const rows = ps.map(p => {
+    const wr = pct(p.winRate);
+    const form = p.resultados.filter(r=>r).slice(-5).map(r=>`<span class="${r==='W'?'fw':'fl'}">${r==='W'?'V':'D'}</span>`).join('');
+    return `<tr onclick="openModal('${p.nome.replace(/'/g,"\'")}')">
+      <td class="c"><span class="pos-cell ${medal(p.rank)}">${p.rank}</span></td>
+      <td><div class="player-info">
+        <div class="player-avatar">${initials(p.nome)}</div>
+        <div><div class="player-name">${p.nome}</div><div class="player-nick">${p.alcunha}</div></div>
+      </div></td>
+      <td class="c hm">${p.jogos}</td>
+      <td class="c hm" style="color:var(--green);font-weight:700">${p.vitorias}</td>
+      <td class="c hm" style="color:var(--red);font-weight:700">${p.derrotas}</td>
+      <td class="hm"><div class="form-strip">${form||'<span style="color:var(--muted);font-size:0.72rem">—</span>'}</div></td>
+      <td class="hm"><div class="wr-cell">
+        <div class="wr-bar"><div class="wr-fill" style="width:${Math.min(wr,100)}%;background:${wrColor(wr)}"></div></div>
+        <span class="wr-txt" style="color:${wrColor(wr)}">${wr}%</span>
+      </div></td>
+      <td class="c"><span class="mp-val" style="color:${p.mediaPonderada>=0.5?'var(--green)':p.mediaPonderada>=0.35?'var(--gold2)':'var(--red)'}">${p.mediaPonderada.toFixed(3)}</span></td>
     </tr>`;
   }).join('');
 
-  const vencedor = players[0];
-
-  // Capa hero (only for current season)
-  let capaHtml = '';
-  if (season.atual) {
-    try {
-      const jornais = JSON.parse(localStorage.getItem('retorta_jornais') || '[]');
-      if (jornais.length > 0) {
-        const latest = jornais[jornais.length - 1];
-        capaHtml = `
-          <div class="capa-hero-wrap">
-            <div class="capa-hero-img"><img src="${latest.src}" alt="Capa"></div>
-            <div class="capa-hero-info">
-              <div class="capa-tag">📰 Última Capa</div>
-              <div class="capa-hero-date">${formatDate(latest.date)}</div>
-              <button class="capa-hero-link" onclick="switchTab('jornais')">Ver arquivo de capas →</button>
-            </div>
-          </div>`;
-      }
-    } catch(e) {}
-  }
-
-  // Report form (only for current season)
   const reportHtml = season.atual ? buildReportForm(season) : '';
 
   document.getElementById('content').innerHTML = `
     ${capaHtml}
     <div class="season-hero">
       <div class="season-title">
-        <h2>${season.tipo} — ${season.edicao} ${current}</h2>
+        <h2>${season.tipo} — ${season.edicao}</h2>
         <p>${season.inicio} → ${season.atual ? 'Em curso' : season.fim}</p>
       </div>
-      <div class="season-stats">
-        <div class="stat-pill"><div class="val">${totalJornadas}</div><div class="lbl">Jornadas</div></div>
-        <div class="stat-pill"><div class="val">${totalJogadores}</div><div class="lbl">Jogadores</div></div>
-        <div class="stat-pill"><div class="val">${vencedor.alcunha}</div><div class="lbl">Líder</div></div>
+      <div class="season-pills">
+        <div class="pill"><div class="pill-val">${played}</div><div class="pill-lbl">Jornadas</div></div>
+        <div class="pill"><div class="pill-val">${ps.length}</div><div class="pill-lbl">Jogadores</div></div>
+        <div class="pill"><div class="pill-val">${ps[0]?.alcunha||'—'}</div><div class="pill-lbl">Líder</div></div>
+        ${topWR?`<div class="pill"><div class="pill-val">${pct(topWR.winRate)}%</div><div class="pill-lbl">${topWR.alcunha} (melhor %)</div></div>`:''}
       </div>
     </div>
+    <div class="sec-title">Classificação</div>
+    <div class="standings-wrap">
+      <table class="standings">
+        <thead><tr>
+          <th class="c">Pos</th><th>Jogador</th>
+          <th class="c hm">J</th><th class="c hm">V</th><th class="c hm">D</th>
+          <th class="hm">Forma</th><th class="hm">Taxa</th><th class="c">Média</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <p style="font-size:0.68rem;color:var(--muted);margin-top:0.5rem">Média = Taxa de vitórias × Factor de presença. Clica num jogador para ver o historial.</p>
+    ${reportHtml}`;
 
-    <div class="section-title">Classificação</div>
-    <table class="standings-table">
-      <thead>
-        <tr>
-          <th class="num">Pos</th>
-          <th>Jogador</th>
-          <th class="num">J</th>
-          <th class="num">V</th>
-          <th class="num hide-mobile">D</th>
-          <th class="hide-mobile">% Vitórias</th>
-          <th class="hide-mobile">Forma</th>
-          <th class="num">Média ⓘ</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <p style="font-size:0.72rem;color:var(--cinza);margin-top:0.5rem">ⓘ Média Ponderada = Taxa de vitórias × Factor de presença (mais jogos = maior factor). Clica num jogador para ver o seu historial.</p>
-    ${reportHtml}
-  `;
-
-  if (season.atual) {
-    checkServer();
-    updateChipPreview();
-  }
+  if (season.atual) { checkServer(); updatePreview(); }
 }
 
-function renderAllTime() {
-  // Aggregate stats per player across all seasons
-  const playerMap = {};
-
-  SEASONS.forEach(season => {
-    season.jogadores.forEach(p => {
-      if (!playerMap[p.nome]) {
-        playerMap[p.nome] = {
-          nome: p.nome,
-          alcunha: p.alcunha,
-          totalJogos: 0,
-          totalVitorias: 0,
-          totalDerrotas: 0,
-          epocas: 0,
-          melhoresResultados: []
-        };
-      }
-      const entry = playerMap[p.nome];
-      entry.totalJogos += p.jogos;
-      entry.totalVitorias += p.vitorias;
-      entry.totalDerrotas += p.derrotas;
-      entry.epocas += 1;
-      entry.melhoresResultados.push({ season: season.label, rank: p.rank, jogos: p.jogos, vitorias: p.vitorias, wr: p.winRate });
-    });
-  });
-
-  const players = Object.values(playerMap).filter(p => p.totalJogos >= 3);
-
-  // Sort by total wins
-  const byWins = [...players].sort((a, b) => b.totalVitorias - a.totalVitorias).slice(0, 8);
-  // Sort by win rate (min 10 games)
-  const byWR = [...players].filter(p => p.totalJogos >= 10).sort((a, b) => (b.totalVitorias/b.totalJogos) - (a.totalVitorias/a.totalJogos)).slice(0, 8);
-  // Sort by appearances
-  const byGames = [...players].sort((a, b) => b.totalJogos - a.totalJogos).slice(0, 8);
-
-  const champions = [
-    { season: "Época de Verão · 1.ª Edição (2024)", winner: "João Capela", record: "13V / 6D · 68.4%" },
-    { season: "Época de Inverno · 1.ª Edição (2024-25)", winner: "João Capela", record: "13V / 5D · 72.2%" },
-    { season: "Época de Verão · 2.ª Edição (2025)", winner: "Joaquim Torrão", record: "12V / 7D · 63.2%" },
-    { season: "Época de Inverno · 2.ª Edição (2025-26)", winner: "Joaquim Torrão", record: "12V / 6D · 66.7%" },
-    { season: "Época de Verão · 3.ª Edição (2026)", winner: "🔴 Em curso", record: "Líder: Francisco Campos 7V/1D" },
-  ];
-
-  const champHtml = champions.map((c, i) => `
-    <div class="champion-row">
-      <span class="champion-trophy">${i < 4 ? '🏆' : '⚡'}</span>
-      <div class="champion-info">
-        <div class="season">${c.season}</div>
-        <div class="name">${c.winner}</div>
-      </div>
-      <div class="champion-stats">${c.record}</div>
-    </div>
-  `).join('');
-
-  function rankList(list, valFn) {
-    return list.map((p, i) => `
-      <div class="alltime-row" onclick="openPlayerModal('${p.nome}')">
-        <span class="alltime-rank">${i+1}</span>
-        <span class="alltime-name">${p.alcunha || p.nome}</span>
-        <span class="alltime-val">${valFn(p)}</span>
-      </div>
-    `).join('');
-  }
-
-  document.getElementById('content').innerHTML = `
-    <div class="season-hero">
-      <div class="season-title">
-        <h2>Histórico Total</h2>
-        <p>Desde 18/03/2024 · Todas as épocas</p>
-      </div>
-      <div class="season-stats">
-        <div class="stat-pill"><div class="val">5</div><div class="lbl">Épocas</div></div>
-        <div class="stat-pill"><div class="val">${Object.keys(playerMap).length}</div><div class="lbl">Jogadores</div></div>
-        <div class="stat-pill"><div class="val">2</div><div class="lbl">Campeões</div></div>
-      </div>
-    </div>
-
-    <div class="section-title">Palmarés</div>
-    <div class="alltime-card" style="margin-bottom:1.5rem">
-      <h3>🏆 Campeões por Época</h3>
-      <div class="champions-list">${champHtml}</div>
-    </div>
-
-    <div class="alltime-grid">
-      <div class="alltime-card">
-        <h3>⚽ Mais Vitórias (total)</h3>
-        ${rankList(byWins, p => p.totalVitorias + 'V')}
-      </div>
-      <div class="alltime-card">
-        <h3>📈 Melhor Taxa de Vitória (mín. 10 jogos)</h3>
-        ${rankList(byWR, p => Math.round(p.totalVitorias/p.totalJogos*100) + '%')}
-      </div>
-      <div class="alltime-card">
-        <h3>🎽 Mais Presenças</h3>
-        ${rankList(byGames, p => p.totalJogos + 'J')}
-      </div>
-    </div>
-    <p style="font-size:0.72rem;color:var(--cinza);margin-top:1rem">Clica num jogador para ver o historial completo por época.</p>
-  `;
-}
-
-function openPlayerModal(nome) {
-  const playerData = {};
-  SEASONS.forEach(season => {
-    const p = season.jogadores.find(j => j.nome === nome);
-    if (p) playerData[season.id] = { season, player: p };
-  });
-
-  const entries = Object.values(playerData);
-  if (entries.length === 0) return;
-
-  const alcunha = entries[0].player.alcunha || nome;
-  const totalJogos = entries.reduce((a, e) => a + e.player.jogos, 0);
-  const totalVitorias = entries.reduce((a, e) => a + e.player.vitorias, 0);
-  const totalDerrotas = entries.reduce((a, e) => a + e.player.derrotas, 0);
-  const totalWR = totalJogos > 0 ? Math.round(totalVitorias / totalJogos * 100) : 0;
-  const epocas = entries.length;
-
-  const seasonRows = entries.map(e => {
-    const p = e.player;
-    const s = e.season;
-    const wr = Math.round(p.winRate * 100);
-    const wrColor = wr >= 60 ? 'var(--vitoria)' : wr >= 50 ? 'var(--ouro-claro)' : 'var(--derrota)';
-    const pos = p.rank;
-    const posIcon = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `${pos}.º`;
-    const form = p.resultados.filter(r => r !== null).slice(-8).map(r =>
-      r === 'W' ? `<span class="form-w">V</span>` : `<span class="form-l">D</span>`
-    ).join('');
-    return `<tr>
-      <td>${s.tipo.replace('Época de ','')} ${s.edicao}</td>
-      <td style="text-align:center">${posIcon}</td>
-      <td style="text-align:center">${p.jogos}</td>
-      <td style="text-align:center;color:var(--vitoria)">${p.vitorias}</td>
-      <td style="text-align:center;color:var(--derrota)">${p.derrotas}</td>
-      <td style="text-align:center;color:${wrColor}">${wr}%</td>
-      <td><div class="form-badges">${form}</div></td>
-    </tr>`;
-  }).join('');
-
-  const wrColor = totalWR >= 60 ? 'var(--vitoria)' : totalWR >= 50 ? 'var(--ouro-claro)' : 'var(--derrota)';
-
-  document.getElementById('modal-content').innerHTML = `
-    <div class="modal-header">
-      <h2>${nome}</h2>
-      <p>Alcunha: <strong style="color:var(--ouro-claro)">${alcunha}</strong> · ${epocas} época${epocas !== 1 ? 's' : ''}</p>
-    </div>
-    <div class="modal-stats-grid">
-      <div class="modal-stat"><div class="val">${totalJogos}</div><div class="lbl">Jogos</div></div>
-      <div class="modal-stat"><div class="val" style="color:var(--vitoria)">${totalVitorias}</div><div class="lbl">Vitórias</div></div>
-      <div class="modal-stat"><div class="val" style="color:${wrColor}">${totalWR}%</div><div class="lbl">Taxa Vitórias</div></div>
-    </div>
-    <div class="section-title" style="margin-bottom:0.5rem">Historial por Época</div>
-    <table class="modal-season-table">
-      <thead><tr>
-        <th>Época</th><th>Pos</th><th>J</th><th>V</th><th>D</th><th>%</th><th>Forma Recente</th>
-      </tr></thead>
-      <tbody>${seasonRows}</tbody>
-    </table>
-  `;
-  document.getElementById('modal-overlay').classList.add('open');
-}
-
-function closeModal() {
-  document.getElementById('modal-overlay').classList.remove('open');
-}
-
-document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-// ── REPORTE DE JOGO ────────────────────────────────────────────────────────
-
+/* ── REPORT FORM ── */
 function buildReportForm(season) {
-  // Detect which dates already have results
-  const playedSet = new Set();
-  season.datas.forEach((d, i) => {
-    if (season.jogadores.some(p => p.resultados[i] !== null)) playedSet.add(d);
-  });
-
-  // Default: first unplayed date in the past or most recent played
   const today = new Date();
-  const pastDates = season.datas.filter(d => {
-    const [dd,mm,yy] = d.split('/');
-    return new Date(yy,mm-1,dd) <= today;
+  const playedSet = new Set();
+  season.datas.forEach((d,i) => {
+    if (season.jogadores.some(p=>p.resultados[i]!==null)) playedSet.add(d);
   });
-  const nextDate = pastDates.find(d => !playedSet.has(d)) || pastDates[pastDates.length - 1] || season.datas[0];
-
-  const dateOptions = season.datas.map(d => {
-    const [dd,mm,yy] = d.split('/');
-    const isPast = new Date(yy,mm-1,dd) <= today;
-    const mark = playedSet.has(d) ? ' ✓' : (isPast ? ' ←' : '');
-    return `<option value="${d}" ${d === nextDate ? 'selected' : ''} ${!isPast ? 'disabled style="color:#555"' : ''}>${d}${mark}</option>`;
+  const pastDates = season.datas.filter(d => { const [dd,mm,yy]=d.split('/'); return new Date(yy,mm-1,dd)<=today; });
+  const next = pastDates.find(d=>!playedSet.has(d)) || pastDates[pastDates.length-1] || season.datas[0];
+  const opts = season.datas.map(d => {
+    const [dd,mm,yy]=d.split('/'); const past=new Date(yy,mm-1,dd)<=today;
+    return `<option value="${d}" ${d===next?'selected':''} ${!past?'disabled style="color:#444"':''}>${d}${playedSet.has(d)?' ✓':past?' ←':''}</option>`;
   }).join('');
-
-  const chips = season.jogadores.map(p =>
-    `<span class="chip" data-name="${p.nome}" data-result="" onclick="toggleChip(this)">${p.alcunha}</span>`
+  const chips = season.jogadores.map(p=>
+    `<span class="chip" data-name="${p.nome}" data-r="" onclick="toggleChip(this)">${p.alcunha}</span>`
   ).join('');
-
   return `
-    <div class="report-section">
-      <div class="report-header">
+    <div class="report-section" style="margin-top:2.5rem">
+      <div class="report-head">
         <h3>📋 Reportar Jogo</h3>
-        <div class="server-status" id="server-status">
-          <span class="status-dot checking"></span>
-          <span class="status-text">A verificar servidor...</span>
-        </div>
+        <div class="srv-status" id="srv-status"><span class="dot chk"></span><span id="srv-txt" style="margin-left:0.4rem;font-size:0.75rem">A verificar...</span></div>
       </div>
-      <div class="report-body">
-        <div class="report-date-row">
-          <label>Jornada:</label>
-          <select id="report-date">${dateOptions}</select>
+      <div id="report-inner">
+        <div class="report-offline" id="report-offline" style="display:none">
+          Servidor local desligado. Para reportar jogos corre:<br><br>
+          <code>python3 reportar.py "Campos, Quim ganharam contra Capela, Renato"</code><br><br>
+          ou inicia o servidor: <code>python3 server.py</code>
         </div>
-
-        <div class="chips-section">
-          <div class="chips-label" style="color:var(--cinza-claro);margin-bottom:0.5rem">
-            Clica nos jogadores: 1.º clique = <span style="color:var(--vitoria)">Vitória</span> · 2.º = <span style="color:var(--derrota)">Derrota</span> · 3.º = retirar
+        <div class="report-body" id="report-form">
+          <div class="date-row"><label>Jornada:</label><select id="rpt-date">${opts}</select></div>
+          <div class="chips-hint">1.º clique <span style="color:var(--green)">Vitória</span> · 2.º <span style="color:var(--red)">Derrota</span> · 3.º retirar</div>
+          <div class="chips-wrap">${chips}</div>
+          <div class="extras-wrap">
+            <label>Outros jogadores (vírgula a separar):</label>
+            <input id="extra-in" placeholder="Nome A, Nome B" oninput="updatePreview()">
+            <div style="display:flex;gap:1rem;margin-top:0.4rem;font-size:0.8rem">
+              <label><input type="radio" name="eside" value="W" checked> Vitória</label>
+              <label><input type="radio" name="eside" value="L"> Derrota</label>
+            </div>
           </div>
-          <div class="chips-wrap" id="chips-wrap">${chips}</div>
-        </div>
-
-        <div class="report-extras">
-          <label>Outros jogadores não listados acima (separa por vírgula)</label>
-          <input type="text" id="extra-winners" placeholder="Ex: Novo Jogador A, Novo Jogador B — todos na mesma equipa (V ou D)" oninput="updateChipPreview()">
-          <div style="display:flex;gap:0.5rem;margin-top:0.4rem">
-            <label style="margin:0"><input type="radio" name="extra-side" value="W" checked> Vitória</label>
-            <label style="margin:0"><input type="radio" name="extra-side" value="L"> Derrota</label>
+          <div class="preview-row">
+            <div class="prev-box pv"><div class="pl">✅ Equipa que ganhou</div><div class="pn" id="prev-v">—</div></div>
+            <div class="prev-box pd"><div class="pl">❌ Equipa que perdeu</div><div class="pn" id="prev-d">—</div></div>
           </div>
-        </div>
-
-        <div class="report-preview">
-          <div class="preview-box pv">
-            <div class="plbl">✅ Equipa que ganhou</div>
-            <div class="pnames" id="prev-v">—</div>
-          </div>
-          <div class="preview-box pd">
-            <div class="plbl">❌ Equipa que perdeu</div>
-            <div class="pnames" id="prev-d">—</div>
+          <div class="act-row">
+            <button class="btn-submit" id="btn-sub" onclick="submitReport('${season.id}')">Enviar Resultado</button>
+            <div class="rpt-msg" id="rpt-msg"></div>
           </div>
         </div>
-
-        <div class="report-actions">
-          <button class="report-submit" id="report-submit" onclick="submitReport('${season.id}')">Enviar Resultado</button>
-          <div class="report-msg" id="report-msg"></div>
-        </div>
-        <p style="font-size:0.7rem;color:var(--cinza);margin-top:0.75rem">
-          Requer o servidor local activo: <code style="background:#0a1f10;padding:0.1rem 0.4rem;border-radius:4px">python3 server.py</code>
-        </p>
       </div>
     </div>`;
 }
 
 function toggleChip(el) {
-  const cur = el.dataset.result;
-  if (cur === '')       { el.dataset.result = 'W'; el.className = 'chip sv'; }
-  else if (cur === 'W') { el.dataset.result = 'L'; el.className = 'chip sd'; }
-  else                  { el.dataset.result = '';  el.className = 'chip'; }
-  updateChipPreview();
+  const c = el.dataset.r;
+  el.dataset.r = c===''?'W':c==='W'?'L':'';
+  el.className = 'chip' + (el.dataset.r==='W'?' sv':el.dataset.r==='L'?' sd':'');
+  updatePreview();
 }
-
-function updateChipPreview() {
-  const winners = [], losers = [];
-  document.querySelectorAll('.chip').forEach(c => {
-    if (c.dataset.result === 'W') winners.push(c.dataset.name.split(' ')[0]);
-    else if (c.dataset.result === 'L') losers.push(c.dataset.name.split(' ')[0]);
-  });
-  // extras
-  const extraInput = document.getElementById('extra-winners');
-  const extraSide = document.querySelector('input[name="extra-side"]:checked');
-  if (extraInput && extraInput.value.trim()) {
-    const extras = extraInput.value.split(',').map(s => s.trim()).filter(Boolean);
-    if (extraSide && extraSide.value === 'W') winners.push(...extras);
-    else losers.push(...extras);
-  }
-  const vEl = document.getElementById('prev-v');
-  const dEl = document.getElementById('prev-d');
-  if (vEl) vEl.textContent = winners.join(', ') || '—';
-  if (dEl) dEl.textContent = losers.join(', ') || '—';
+function updatePreview() {
+  const W=[],L=[];
+  document.querySelectorAll('.chip').forEach(c=>{ if(c.dataset.r==='W')W.push(c.dataset.name.split(' ')[0]); else if(c.dataset.r==='L')L.push(c.dataset.name.split(' ')[0]); });
+  const ex = (document.getElementById('extra-in')||{value:''}).value.split(',').map(s=>s.trim()).filter(Boolean);
+  const side = (document.querySelector('input[name=eside]:checked')||{value:'W'}).value;
+  if(ex.length) (side==='W'?W:L).push(...ex);
+  const ve=document.getElementById('prev-v'), de=document.getElementById('prev-d');
+  if(ve) ve.textContent=W.join(', ')||'—';
+  if(de) de.textContent=L.join(', ')||'—';
 }
-
-async function submitReport(seasonId) {
-  const date = document.getElementById('report-date').value;
-
-  const winners = [], losers = [];
-  document.querySelectorAll('.chip').forEach(c => {
-    if (c.dataset.result === 'W') winners.push(c.dataset.name);
-    else if (c.dataset.result === 'L') losers.push(c.dataset.name);
-  });
-
-  // Add extras
-  const extraInput = document.getElementById('extra-winners');
-  const extraSide = document.querySelector('input[name="extra-side"]:checked');
-  if (extraInput && extraInput.value.trim()) {
-    const extras = extraInput.value.split(',').map(s => s.trim()).filter(Boolean);
-    if (extraSide && extraSide.value === 'W') winners.push(...extras);
-    else losers.push(...extras);
-  }
-
-  if (winners.length === 0 || losers.length === 0) {
-    showReportMsg('Selecciona pelo menos um jogador em cada equipa.', 'error');
-    return;
-  }
-
-  const btn = document.getElementById('report-submit');
-  btn.disabled = true; btn.textContent = 'A enviar...';
-
+async function submitReport(sid) {
+  const date=document.getElementById('rpt-date').value;
+  const W=[],L=[];
+  document.querySelectorAll('.chip').forEach(c=>{ if(c.dataset.r==='W')W.push(c.dataset.name); else if(c.dataset.r==='L')L.push(c.dataset.name); });
+  const ex=(document.getElementById('extra-in').value||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const side=(document.querySelector('input[name=eside]:checked')||{value:'W'}).value;
+  if(ex.length)(side==='W'?W:L).push(...ex);
+  if(!W.length||!L.length){setMsg('Selecciona jogadores nas duas equipas.','err');return;}
+  const btn=document.getElementById('btn-sub');
+  btn.disabled=true; btn.textContent='A enviar...';
   try {
-    const res  = await fetch('http://localhost:8765/report', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ season_id: seasonId, date, winners, losers })
-    });
-    const data = await res.json();
-    if (data.ok) {
-      const nf = data.not_found.length ? ` (não encontrado: ${data.not_found.join(', ')})` : '';
-      showReportMsg(
-        `✅ ${data.updated.length} jogadores actualizados${nf}. ` +
-        `<button class="reload-btn" onclick="location.reload()">Recarregar página</button>`,
-        'success'
-      );
-    } else {
-      showReportMsg('❌ ' + data.error, 'error');
-    }
-  } catch {
-    showReportMsg('❌ Servidor não encontrado. Corre <strong>python3 server.py</strong> primeiro.', 'error');
-  }
-  btn.disabled = false; btn.textContent = 'Enviar Resultado';
+    const res=await fetch('http://localhost:8765/report',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({season_id:sid,date,winners:W,losers:L})});
+    const d=await res.json();
+    if(d.ok){
+      const nf=d.not_found.length?` (não encontrados: ${d.not_found.join(', ')})`:'' ;
+      setMsg(`✅ ${d.updated.length} jogadores actualizados${nf}. <button class="btn-reload" onclick="location.reload()">Recarregar</button>`,'ok');
+    } else setMsg('❌ '+d.error,'err');
+  } catch { setMsg('❌ Servidor não encontrado.','err'); }
+  btn.disabled=false; btn.textContent='Enviar Resultado';
 }
-
-function showReportMsg(html, cls) {
-  const el = document.getElementById('report-msg');
-  if (!el) return;
-  el.innerHTML = html;
-  el.className = 'report-msg ' + cls;
-}
+function setMsg(html,cls){const el=document.getElementById('rpt-msg');if(el){el.innerHTML=html;el.className='rpt-msg '+cls;}}
 
 async function checkServer() {
-  const el = document.getElementById('server-status');
-  if (!el) return;
+  const dot=document.querySelector('.dot.chk'), txt=document.getElementById('srv-txt');
+  const form=document.getElementById('report-form'), offline=document.getElementById('report-offline');
   try {
-    const res = await fetch('http://localhost:8765/ping', { signal: AbortSignal.timeout(1500) });
-    if (res.ok) {
-      el.innerHTML = '<span class="status-dot online"></span><span class="status-text">Servidor ligado</span>';
+    const r=await fetch('http://localhost:8765/ping',{signal:AbortSignal.timeout(1500)});
+    if(r.ok){
+      if(dot){dot.className='dot on';}
+      if(txt) txt.textContent='Servidor ligado';
+      if(form) form.style.display='';
+      if(offline) offline.style.display='none';
       return;
     }
   } catch {}
-  el.innerHTML = '<span class="status-dot offline"></span><span class="status-text">Servidor desligado</span>';
+  if(dot) dot.className='dot off';
+  if(txt) txt.textContent='Servidor desligado';
+  if(form) form.style.display='none';
+  if(offline) offline.style.display='';
 }
 
-// ── CAPAS DE JORNAIS ──────────────────────────────────────────────────────
-const STORAGE_KEY = 'retorta_jornais';
+/* ── ALL-TIME ── */
+function renderAllTime() {
+  const pm={};
+  SEASONS.forEach(s=>s.jogadores.forEach(p=>{
+    if(!pm[p.nome]) pm[p.nome]={nome:p.nome,alc:p.alcunha,j:0,v:0,epocas:0};
+    pm[p.nome].j+=p.jogos; pm[p.nome].v+=p.vitorias; pm[p.nome].epocas++;
+  }));
+  const pl=Object.values(pm).filter(p=>p.j>=3);
+  const byV  =[...pl].sort((a,b)=>b.v-a.v).slice(0,8);
+  const byWR =[...pl].filter(p=>p.j>=10).sort((a,b)=>(b.v/b.j)-(a.v/a.j)).slice(0,8);
+  const byJ  =[...pl].sort((a,b)=>b.j-a.j).slice(0,8);
 
-function loadJornais() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
-  catch { return []; }
-}
+  const champs=[
+    {s:'Época de Verão · 1.ª Edição (2024)',    w:'João Capela',       r:'13V/6D · 68%'},
+    {s:'Época de Inverno · 1.ª Edição (2024-25)',w:'João Capela',       r:'13V/5D · 72%'},
+    {s:'Época de Verão · 2.ª Edição (2025)',    w:'Joaquim Torrão',    r:'12V/7D · 63%'},
+    {s:'Época de Inverno · 2.ª Edição (2025-26)',w:'Joaquim Torrão',   r:'12V/6D · 67%'},
+    {s:'Época de Verão · 3.ª Edição (2026)',    w:'🔴 Em curso',       r:'Líder: Campos 7V/1D'},
+  ];
+  const trophy=['🏆','🏆','🏆','🏆','⚡'];
+  const champHtml=champs.map((c,i)=>`
+    <div class="champ-row">
+      <span class="champ-trophy">${trophy[i]}</span>
+      <div class="champ-info"><div class="cs">${c.s}</div><div class="cn">${c.w}</div></div>
+      <div class="champ-record">${c.r}</div>
+    </div>`).join('');
 
-function saveJornais(list) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-}
+  const list=(arr,fn)=>arr.map((p,i)=>`
+    <div class="at-row" onclick="openModal('${p.nome.replace(/'/g,"\'")}')">
+      <span class="at-rank">${i+1}</span>
+      <span class="at-name">${p.alc||p.nome}</span>
+      <span class="at-val">${fn(p)}</span>
+    </div>`).join('');
 
-function formatDate(iso) {
-  const d = new Date(iso);
-  const day = String(d.getDate()).padStart(2,'0');
-  const months = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
-  return `${day} de ${months[d.getMonth()]} de ${d.getFullYear()}`;
-}
-
-function compressImage(file, maxW, maxH, quality, cb) {
-  const img = new Image();
-  const url = URL.createObjectURL(file);
-  img.onload = () => {
-    let w = img.width, h = img.height;
-    if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
-    if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
-    const canvas = document.createElement('canvas');
-    canvas.width = w; canvas.height = h;
-    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-    URL.revokeObjectURL(url);
-    cb(canvas.toDataURL('image/jpeg', quality));
-  };
-  img.src = url;
-}
-
-function deleteJornal(id) {
-  const list = loadJornais().filter(j => j.id !== id);
-  saveJornais(list);
-  renderJornais();
-}
-
-function renderJornais() {
-  const list = loadJornais();
-  const cards = list.length === 0
-    ? `<div class="jornais-empty">Ainda não há capas. Faz upload da primeira! 📰</div>`
-    : list.slice().reverse().map(j => `
-        <div class="jornal-card">
-          <div class="jornal-img-wrap">
-            <img src="${j.src}" alt="Capa" loading="lazy">
-            <button class="jornal-delete" onclick="deleteJornal('${j.id}')" title="Apagar">✕</button>
-          </div>
-          <div class="jornal-date">${formatDate(j.date)}</div>
-          ${j.caption ? `<div class="jornal-caption">${j.caption}</div>` : ''}
-        </div>
-      `).join('');
-
-  document.getElementById('content').innerHTML = `
+  document.getElementById('content').innerHTML=`
     <div class="season-hero">
-      <div class="season-title">
-        <h2>Capas de Jornais</h2>
-        <p>Guarda aqui as capas de jornais da Retorta League</p>
-      </div>
-      <div class="season-stats">
-        <div class="stat-pill"><div class="val">${list.length}</div><div class="lbl">Capas</div></div>
+      <div class="season-title"><h2>Histórico Total</h2><p>Desde 18/03/2024 · Todas as épocas</p></div>
+      <div class="season-pills">
+        <div class="pill"><div class="pill-val">5</div><div class="pill-lbl">Épocas</div></div>
+        <div class="pill"><div class="pill-val">${Object.keys(pm).length}</div><div class="pill-lbl">Jogadores</div></div>
+        <div class="pill"><div class="pill-val">2</div><div class="pill-lbl">Campeões</div></div>
       </div>
     </div>
-
-    <div class="jornal-upload-area" id="jornal-drop" onclick="document.getElementById('jornal-input').click()">
-      <div class="jornal-upload-icon">📰</div>
-      <div class="jornal-upload-text">Clica ou arrasta uma imagem para fazer upload</div>
-      <div class="jornal-upload-sub">JPG, PNG, WEBP — máx. 10 MB</div>
-      <input type="file" id="jornal-input" accept="image/*" multiple style="display:none">
-    </div>
-
-    <div class="section-title" style="margin-top:2rem">Arquivo</div>
-    <div class="jornais-grid">${cards}</div>
-  `;
-
-  // Wire up file input
-  const input = document.getElementById('jornal-input');
-  input.onchange = e => handleFiles(e.target.files);
-
-  // Drag & drop
-  const drop = document.getElementById('jornal-drop');
-  drop.ondragover = e => { e.preventDefault(); drop.classList.add('dragging'); };
-  drop.ondragleave = () => drop.classList.remove('dragging');
-  drop.ondrop = e => { e.preventDefault(); drop.classList.remove('dragging'); handleFiles(e.dataTransfer.files); };
+    <div class="sec-title">Palmarés</div>
+    <div class="champions-grid">${champHtml}</div>
+    <div class="at-grid">
+      <div class="at-card"><h3>⚽ Mais Vitórias</h3>${list(byV,p=>p.v+'V')}</div>
+      <div class="at-card"><h3>📈 Melhor Taxa (mín. 10J)</h3>${list(byWR,p=>Math.round(p.v/p.j*100)+'%')}</div>
+      <div class="at-card"><h3>🎽 Mais Presenças</h3>${list(byJ,p=>p.j+'J')}</div>
+    </div>`;
 }
 
-function handleFiles(files) {
-  const list = loadJornais();
-  let remaining = files.length;
-  Array.from(files).forEach(file => {
-    if (!file.type.startsWith('image/')) { remaining--; return; }
-    compressImage(file, 1200, 1600, 0.82, src => {
-      list.push({ id: Date.now() + Math.random().toString(36).slice(2), src, date: new Date().toISOString(), caption: '' });
-      remaining--;
-      if (remaining === 0) { saveJornais(list); renderJornais(); }
+/* ── CAPAS ── */
+function renderCapas() {
+  const cards = CAPAS.length===0
+    ? '<div class="capas-empty">Ainda não há capas. Faz upload da primeira! 📰</div>'
+    : [...CAPAS].reverse().map(c=>{
+        const src = c.filename ? `capas/${c.filename}` : (c.src||'');
+        return `<div class="capa-card" onclick="openLightbox('${src}')">
+          <img src="${src}" alt="Capa" loading="lazy">
+          <div class="capa-date">${formatDate(c.date)}</div>
+        </div>`;
+      }).join('');
+
+  document.getElementById('content').innerHTML=`
+    <div class="season-hero">
+      <div class="season-title"><h2>Capas de Jornais</h2><p>Arquivo de capas da Retorta League</p></div>
+      <div class="season-pills"><div class="pill"><div class="pill-val">${CAPAS.length}</div><div class="pill-lbl">Capas</div></div></div>
+    </div>
+    <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-in').click()">
+      <div class="upload-icon">📰</div>
+      <div class="upload-txt">Clica ou arrasta uma imagem</div>
+      <div class="upload-sub">JPG · PNG · WEBP — máx. 10 MB por imagem</div>
+      <input type="file" id="file-in" accept="image/*" multiple style="display:none">
+    </div>
+    <div class="sec-title">Arquivo</div>
+    <div class="capas-grid">${cards}</div>`;
+
+  const fi=document.getElementById('file-in');
+  if(fi) fi.onchange=e=>handleFiles(e.target.files);
+  const dz=document.getElementById('drop-zone');
+  if(dz){
+    dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag');};
+    dz.ondragleave=()=>dz.classList.remove('drag');
+    dz.ondrop=e=>{e.preventDefault();dz.classList.remove('drag');handleFiles(e.dataTransfer.files);};
+  }
+}
+
+function compress(file,cb){
+  const img=new Image(), url=URL.createObjectURL(file);
+  img.onload=()=>{
+    let w=img.width,h=img.height;
+    if(w>1200){h=Math.round(h*1200/w);w=1200;}
+    if(h>1600){w=Math.round(w*1600/h);h=1600;}
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    cv.getContext('2d').drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(url);
+    cb(cv.toDataURL('image/jpeg',0.85));
+  };
+  img.src=url;
+}
+
+function handleFiles(files){
+  Array.from(files).forEach(f=>{
+    if(!f.type.startsWith('image/')) return;
+    compress(f,src=>{
+      const date=new Date().toISOString();
+      // Try server first (saves to git), fall back to localStorage
+      fetch('http://localhost:8765/upload-capa',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({src,date,caption:''})})
+        .then(r=>r.json())
+        .then(d=>{ if(d.ok){ alert('✅ Capa guardada e publicada no GitHub!'); location.reload(); } })
+        .catch(()=>{
+          // Fallback: localStorage
+          const key='retorta_jornais';
+          const list=JSON.parse(localStorage.getItem(key)||'[]');
+          list.push({src,date,caption:''});
+          localStorage.setItem(key,JSON.stringify(list));
+          alert('✅ Capa guardada localmente (inicia o servidor para publicar no GitHub)');
+          renderCapas();
+        });
     });
   });
 }
+
+/* ── LIGHTBOX ── */
+function openLightbox(src){ document.getElementById('lb-img').src=src; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModal(); closeLightbox(); } });
+
+/* ── PLAYER MODAL ── */
+function openModal(nome){
+  const entries=[];
+  SEASONS.forEach(s=>{ const p=s.jogadores.find(j=>j.nome===nome); if(p) entries.push({s,p}); });
+  if(!entries.length) return;
+  const alc=entries[0].p.alcunha||nome;
+  const totJ=entries.reduce((a,e)=>a+e.p.jogos,0);
+  const totV=entries.reduce((a,e)=>a+e.p.vitorias,0);
+  const totWR=totJ?Math.round(totV/totJ*100):0;
+  const wrC=totWR>=60?'var(--green)':totWR>=50?'var(--gold2)':'var(--red)';
+  const trows=entries.map(e=>{
+    const p=e.p,s=e.s;
+    const wr=pct(p.winRate),c=wrColor(wr);
+    const pos=p.rank,pi=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':pos+'.º';
+    const form=p.resultados.filter(r=>r).slice(-6).map(r=>r==='W'?'<span class="fw">V</span>':'<span class="fl">D</span>').join('');
+    return `<tr><td>${s.tipo.replace('Época de ','')} ${s.edicao}</td><td style="text-align:center">${pi}</td><td style="text-align:center">${p.jogos}</td><td style="text-align:center;color:var(--green)">${p.vitorias}</td><td style="text-align:center;color:var(--red)">${p.derrotas}</td><td style="text-align:center;color:${c}">${wr}%</td><td><div class="form-strip">${form}</div></td></tr>`;
+  }).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <h2>${nome}</h2><div class="modal-sub">Alcunha: <strong style="color:var(--gold2)">${alc}</strong> · ${entries.length} época${entries.length!==1?'s':''}</div>
+    <div class="modal-stats">
+      <div class="ms"><div class="v">${totJ}</div><div class="l">Jogos</div></div>
+      <div class="ms"><div class="v" style="color:var(--green)">${totV}</div><div class="l">Vitórias</div></div>
+      <div class="ms"><div class="v" style="color:${wrC}">${totWR}%</div><div class="l">Taxa</div></div>
+    </div>
+    <div class="sec-title" style="margin-bottom:0.5rem">Historial por Época</div>
+    <table><thead><tr><th>Época</th><th>Pos</th><th>J</th><th>V</th><th>D</th><th>%</th><th>Forma</th></tr></thead><tbody>${trows}</tbody></table>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
+document.getElementById('modal-overlay').addEventListener('click',function(e){ if(e.target===this)closeModal(); });
 
 // Init
 renderTabs();
