@@ -209,7 +209,39 @@ table.standings td{padding:.7rem .9rem;vertical-align:middle;}
 .rpt-date{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap;}
 .rpt-date label{font-size:.78rem;font-weight:600;color:var(--muted2);}
 .rpt-date select{background:#0a1a0d;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:.45rem .75rem;font-size:.85rem;cursor:pointer;}
-.rpt-hint{font-size:.72rem;color:var(--muted);margin-bottom:.65rem;}
+/* Text input mode */
+.rpt-text-row{display:flex;gap:.5rem;margin-bottom:1.25rem;}
+.rpt-text-input{flex:1;background:#0a1a0d;border:1px solid var(--border);border-radius:10px;padding:.65rem 1rem;color:var(--text);font-size:.88rem;font-family:var(--fb);outline:none;transition:border .15s;}
+.rpt-text-input:focus{border-color:var(--border2);}
+.rpt-text-btn{background:var(--gold);border:none;border-radius:10px;padding:.65rem 1rem;color:#000;font-weight:700;font-size:.9rem;cursor:pointer;white-space:nowrap;}
+.rpt-text-btn:hover{background:var(--gold2);}
+.rpt-divider{display:flex;align-items:center;gap:.75rem;margin:1.25rem 0;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);}
+.rpt-divider::before,.rpt-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+/* Player cards */
+.rpt-hint{font-size:.72rem;color:var(--muted);margin-bottom:.75rem;}
+.player-cards{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.75rem;}
+.pc{display:flex;flex-direction:column;align-items:center;gap:.3rem;background:var(--card2);border:2px solid var(--border);border-radius:10px;padding:.6rem .5rem .5rem;cursor:pointer;transition:all .15s;user-select:none;min-width:68px;position:relative;}
+.pc:hover{border-color:var(--border2);transform:translateY(-1px);}
+.pc.sv{background:rgba(46,204,113,.13);border-color:var(--green);}
+.pc.sd{background:rgba(231,76,60,.13);border-color:var(--red);}
+.pc-av{width:36px;height:36px;border-radius:50%;background:var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:700;font-size:.8rem;color:var(--gold2);transition:all .15s;}
+.pc.sv .pc-av{background:var(--green);color:#fff;}
+.pc.sd .pc-av{background:var(--red);color:#fff;}
+.pc-name{font-size:.7rem;font-weight:600;text-align:center;line-height:1.2;color:var(--muted2);max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pc.sv .pc-name{color:var(--green);}
+.pc.sd .pc-name{color:var(--red);}
+.pc-state{font-size:.65rem;font-weight:800;height:12px;}
+.pc.sv .pc-state{color:var(--green);}
+.pc.sd .pc-state{color:var(--red);}
+/* Add player */
+.add-player-row{display:flex;align-items:center;gap:.5rem;margin-bottom:1.25rem;flex-wrap:wrap;}
+.add-player-input{background:#0a1a0d;border:1px solid var(--border);border-radius:8px;padding:.4rem .75rem;color:var(--text);font-size:.84rem;width:180px;outline:none;}
+.add-player-input:focus{border-color:var(--border2);}
+.add-player-side{display:flex;gap:.5rem;}
+.add-player-side button{background:none;border:2px solid;border-radius:7px;padding:.35rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.add-v{border-color:var(--green);color:var(--green);}.add-v:hover{background:rgba(46,204,113,.15);}
+.add-d{border-color:var(--red);color:var(--red);}.add-d:hover{background:rgba(231,76,60,.15);}
+/* Preview + actions */
 .rpt-preview{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.25rem 0;}
 .rpt-box{background:#0a1a0d;border-radius:8px;padding:.75rem;min-height:48px;}
 .rpt-box-lbl{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem;}
@@ -410,7 +442,14 @@ function buildReportForm(season){
   const pastDates=season.datas.filter(d=>{ const [dd,mm,yy]=d.split('/'); return new Date(yy,mm-1,dd)<=today; });
   const nextDate=pastDates.find(d=>!playedSet.has(d))||pastDates[pastDates.length-1]||season.datas[0];
   const dateOpts=season.datas.map(d=>{ const [dd,mm,yy]=d.split('/'); const past=new Date(yy,mm-1,dd)<=today; return `<option value="${d}"${d===nextDate?' selected':''}${!past?' disabled style="color:#444"':''}>${d}${playedSet.has(d)?' ✓':past?' ←':''}</option>`; }).join('');
-  const chips=season.jogadores.map(p=>`<span class="chip" data-name="${p.nome}" data-r="" onclick="toggleChip(this)">${p.alcunha}</span>`).join('');
+  const cards=season.jogadores.map(p=>{
+    const av=initials(p.nome);
+    return `<div class="pc" data-name="${p.nome}" data-r="" onclick="toggleCard(this)" title="${p.nome}">
+      <div class="pc-av">${av}</div>
+      <div class="pc-name">${p.alcunha}</div>
+      <div class="pc-state">·</div>
+    </div>`;
+  }).join('');
 
   if(!token) return `
     <div class="rpt-sec">
@@ -428,16 +467,39 @@ function buildReportForm(season){
         <div style="display:flex;align-items:center;gap:.4rem;font-size:.75rem"><span class="dot ok"></span><span>GitHub conectado</span></div>
       </div>
       <div class="rpt-body">
+
         <div class="rpt-date">
           <label>Jornada:</label>
           <select id="rpt-date">${dateOpts}</select>
         </div>
-        <div class="rpt-hint">
-          1.º clique <span style="color:var(--green);font-weight:700">● Vitória</span> &nbsp;·&nbsp;
-          2.º clique <span style="color:var(--red);font-weight:700">● Derrota</span> &nbsp;·&nbsp;
-          3.º clique retira
+
+        <div class="rpt-hint" style="margin-bottom:.5rem;font-size:.73rem;color:var(--muted2)">
+          Descreve o resultado em texto e o Claude interpreta automaticamente:
         </div>
-        <div class="chips-wrap">${chips}</div>
+        <div class="rpt-text-row">
+          <input class="rpt-text-input" id="rpt-text" placeholder='Ex: "Campos, Quim e Rodrigo ganharam. Perderam o Capela, Renato e Vieira"'
+            onkeydown="if(event.key==='Enter') sendText('${season.id}')">
+          <button class="rpt-text-btn" onclick="sendText('${season.id}')">Enviar ➤</button>
+        </div>
+
+        <div class="rpt-divider">ou selecciona manualmente</div>
+
+        <div class="rpt-hint">
+          Clica nos jogadores &nbsp;·&nbsp;
+          <span style="color:var(--green);font-weight:700">1.º = Vitória</span> &nbsp;·&nbsp;
+          <span style="color:var(--red);font-weight:700">2.º = Derrota</span> &nbsp;·&nbsp;
+          3.º = retira
+        </div>
+        <div class="player-cards" id="player-cards">${cards}</div>
+
+        <div class="add-player-row">
+          <input class="add-player-input" id="new-player-name" placeholder="Novo jogador...">
+          <div class="add-player-side">
+            <button class="add-v" onclick="addNewPlayer('W')">+ Vitória</button>
+            <button class="add-d" onclick="addNewPlayer('L')">+ Derrota</button>
+          </div>
+        </div>
+
         <div class="rpt-preview">
           <div class="rpt-box">
             <div class="rpt-box-lbl" style="color:var(--green)">✅ Equipa que ganhou</div>
@@ -456,15 +518,67 @@ function buildReportForm(season){
     </div>`;
 }
 
-function toggleChip(el){
+function toggleCard(el){
   const c=el.dataset.r;
   el.dataset.r=c===''?'W':c==='W'?'L':'';
-  el.className='chip'+(el.dataset.r==='W'?' sv':el.dataset.r==='L'?' sd':'');
+  const r=el.dataset.r;
+  el.className='pc'+(r==='W'?' sv':r==='L'?' sd':'');
+  el.querySelector('.pc-state').textContent=r==='W'?'✓ V':r==='L'?'✗ D':'·';
+  updatePreview();
+}
+
+function addNewPlayer(side){
+  const inp=document.getElementById('new-player-name');
+  const name=(inp.value||'').trim();
+  if(!name) return;
+  inp.value='';
+  // Create a temporary card for this new player
+  const container=document.getElementById('player-cards');
+  if(!container) return;
+  const av=name.split(' ').filter((_,i,a)=>i===0||i===a.length-1).map(w=>w[0]).join('').toUpperCase()||name[0].toUpperCase();
+  const el=document.createElement('div');
+  el.className='pc'+(side==='W'?' sv':' sd');
+  el.dataset.name=name; el.dataset.r=side;
+  el.onclick=()=>toggleCard(el);
+  el.title=name;
+  el.innerHTML=`<div class="pc-av">${av}</div><div class="pc-name">${name.split(' ')[0]}</div><div class="pc-state">${side==='W'?'✓ V':'✗ D'}</div>`;
+  container.appendChild(el);
+  updatePreview();
+}
+
+function updatePreview(){
   const W=[],L=[];
-  document.querySelectorAll('.chip').forEach(c=>{ if(c.dataset.r==='W') W.push(c.dataset.name.split(' ')[0]); else if(c.dataset.r==='L') L.push(c.dataset.name.split(' ')[0]); });
+  document.querySelectorAll('.pc').forEach(c=>{ if(c.dataset.r==='W') W.push(c.dataset.name.split(' ')[0]); else if(c.dataset.r==='L') L.push(c.dataset.name.split(' ')[0]); });
   const ve=document.getElementById('prev-v'),de=document.getElementById('prev-d');
   if(ve) ve.textContent=W.join(', ')||'—';
   if(de) de.textContent=L.join(', ')||'—';
+}
+
+async function sendText(seasonId){
+  const text=(document.getElementById('rpt-text').value||'').trim();
+  if(!text) return;
+  const btn=document.getElementById('rpt-btn');
+  if(btn){ btn.disabled=true; btn.textContent='A enviar...'; }
+  setMsg('<span class="rpt-progress"><span class="spinner"></span> Claude está a interpretar o resultado...</span>','');
+  try {
+    const res=await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WF_FILE}/dispatches`,{
+      method:'POST',
+      headers:{'Authorization':`token ${getToken()}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({ref:'main',inputs:{season_id:seasonId,date:document.getElementById('rpt-date').value,texto:text,winners:'[]',losers:'[]'}})
+    });
+    if(res.status===204||res.ok){
+      if(btn){ btn.textContent='✅ Enviado!'; }
+      setMsg('<span class="rpt-progress"><span class="spinner"></span> <span id="poll-txt">A processar (~2 min)...</span></span>','');
+      pollAction();
+    } else {
+      const err=await res.json().catch(()=>({}));
+      setMsg(`❌ ${err.message||res.status} <a onclick="openSettings()" style="color:var(--gold2);cursor:pointer">⚙️ token</a>`,'');
+      if(btn){ btn.disabled=false; btn.textContent='Reportar Jogo'; }
+    }
+  } catch {
+    setMsg('❌ Sem ligação.','');
+    if(btn){ btn.disabled=false; btn.textContent='Reportar Jogo'; }
+  }
 }
 
 async function submitReport(seasonId){
