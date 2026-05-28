@@ -473,17 +473,6 @@ function buildReportForm(season){
           <select id="rpt-date">${dateOpts}</select>
         </div>
 
-        <div class="rpt-hint" style="margin-bottom:.5rem;font-size:.73rem;color:var(--muted2)">
-          Descreve o resultado em texto e o Claude interpreta automaticamente:
-        </div>
-        <div class="rpt-text-row">
-          <input class="rpt-text-input" id="rpt-text" placeholder='Ex: "Campos, Quim e Rodrigo ganharam. Perderam o Capela, Renato e Vieira"'
-            onkeydown="if(event.key==='Enter') sendText('${season.id}')">
-          <button class="rpt-text-btn" onclick="sendText('${season.id}')">Enviar ➤</button>
-        </div>
-
-        <div class="rpt-divider">ou selecciona manualmente</div>
-
         <div class="rpt-hint">
           Clica nos jogadores &nbsp;·&nbsp;
           <span style="color:var(--green);font-weight:700">1.º = Vitória</span> &nbsp;·&nbsp;
@@ -554,32 +543,7 @@ function updatePreview(){
   if(de) de.textContent=L.join(', ')||'—';
 }
 
-async function sendText(seasonId){
-  const text=(document.getElementById('rpt-text').value||'').trim();
-  if(!text) return;
-  const btn=document.getElementById('rpt-btn');
-  if(btn){ btn.disabled=true; btn.textContent='A enviar...'; }
-  setMsg('<span class="rpt-progress"><span class="spinner"></span> Claude está a interpretar o resultado...</span>','');
-  try {
-    const res=await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WF_FILE}/dispatches`,{
-      method:'POST',
-      headers:{'Authorization':`token ${getToken()}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-      body:JSON.stringify({ref:'main',inputs:{season_id:seasonId,date:document.getElementById('rpt-date').value,texto:text,winners:'[]',losers:'[]'}})
-    });
-    if(res.status===204||res.ok){
-      if(btn){ btn.textContent='✅ Enviado!'; }
-      setMsg('<span class="rpt-progress"><span class="spinner"></span> <span id="poll-txt">A processar (~2 min)...</span></span>','');
-      pollAction();
-    } else {
-      const err=await res.json().catch(()=>({}));
-      setMsg(`❌ ${err.message||res.status} <a onclick="openSettings()" style="color:var(--gold2);cursor:pointer">⚙️ token</a>`,'');
-      if(btn){ btn.disabled=false; btn.textContent='Reportar Jogo'; }
-    }
-  } catch {
-    setMsg('❌ Sem ligação.','');
-    if(btn){ btn.disabled=false; btn.textContent='Reportar Jogo'; }
-  }
-}
+
 
 async function submitReport(seasonId){
   const date=document.getElementById('rpt-date').value;

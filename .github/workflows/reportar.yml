@@ -10,18 +10,12 @@ on:
       date:
         description: 'Data DD/MM/YYYY'
         required: true
-      texto:
-        description: 'Resultado em texto livre (Claude interpreta)'
-        required: false
-        default: ''
       winners:
-        description: 'Vencedores (JSON) — ignorado se texto preenchido'
-        required: false
-        default: '[]'
+        description: 'Vencedores (JSON)'
+        required: true
       losers:
-        description: 'Derrotados (JSON) — ignorado se texto preenchido'
-        required: false
-        default: '[]'
+        description: 'Derrotados (JSON)'
+        required: true
 
 jobs:
   update:
@@ -35,19 +29,16 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Instalar dependências
-        run: pip install openpyxl anthropic
+      - run: pip install openpyxl
 
       - name: Actualizar Excel e regenerar site
         run: python3 reportar_action.py
         env:
-          SKIP_GIT_PUSH: '1'
+          SKIP_GIT_PUSH:  '1'
           SEASON_ID:      ${{ github.event.inputs.season_id }}
           JORNADA_DATE:   ${{ github.event.inputs.date }}
-          TEXTO:          ${{ github.event.inputs.texto }}
           WINNERS_JSON:   ${{ github.event.inputs.winners }}
           LOSERS_JSON:    ${{ github.event.inputs.losers }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Commit e push
         uses: stefanzweifel/git-auto-commit-action@v5
