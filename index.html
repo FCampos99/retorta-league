@@ -171,10 +171,13 @@ table.standings td{padding:.7rem .9rem;vertical-align:middle;}
 .upload-txt{font-weight:600;color:var(--text);margin-bottom:.2rem;}
 .upload-sub{font-size:.73rem;color:var(--muted);}
 .capas-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1.25rem;}
-.capa-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .15s;}
+.capa-card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:transform .15s;position:relative;}
 .capa-card:hover{transform:translateY(-4px);}
-.capa-card img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover;}
+.capa-card img{width:100%;display:block;aspect-ratio:3/4;object-fit:cover;cursor:pointer;}
 .capa-date{padding:.5rem .75rem;font-size:.73rem;color:var(--muted2);font-weight:600;}
+.capa-del{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;line-height:1;}
+.capa-card:hover .capa-del{opacity:1;}
+.capa-del:hover{background:var(--red);}
 .capas-empty{text-align:center;color:var(--muted);padding:3rem;}
 
 /* LIGHTBOX */
@@ -695,7 +698,11 @@ function renderAllTime(){
 function renderCapas(){
   const cards=CAPAS.length===0
     ?'<div class="capas-empty">Ainda não há capas. Faz upload da primeira! 📰</div>'
-    :[...CAPAS].reverse().map(c=>{ const src=c.filename?`capas/${c.filename}`:(c.src||''); return `<div class="capa-card" onclick="openLightbox('${src}')"><img src="${src}" alt="Capa" loading="lazy"><div class="capa-date">${formatDate(c.date)}</div></div>`; }).join('');
+    :[...CAPAS].reverse().map(c=>{
+        const src=c.filename?`capas/${c.filename}`:(c.src||'');
+        const delBtn=c.filename?`<button class="capa-del" onclick="event.stopPropagation();deleteCapa('${c.filename}')" title="Apagar">✕</button>`:'';
+        return `<div class="capa-card"><img src="${src}" alt="Capa" loading="lazy" onclick="openLightbox('${src}')">${delBtn}<div class="capa-date">${formatDate(c.date)}</div></div>`;
+      }).join('');
   document.getElementById('content').innerHTML=`
     <div class="season-hero">
       <div class="season-title"><h2>Capas de Jornais</h2><p>Arquivo de capas da Retorta League</p></div>
@@ -759,6 +766,36 @@ function handleFiles(files){
 }
 
 /* ── LIGHTBOX ── */
+async function deleteCapa(filename){
+  if(!confirm(`Apagar esta capa?\n${filename}`)) return;
+  const token=getToken();
+  if(!token){ alert('Configura o token no ⚙️'); return; }
+  const api=`https://api.github.com/repos/${REPO}/contents/capas`;
+  const headers={'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
+  try {
+    // 1. Obter SHA da imagem
+    const imgRes=await fetch(`${api}/${filename}`,{headers});
+    if(!imgRes.ok) throw new Error('Ficheiro não encontrado no repositório');
+    const imgData=await imgRes.json();
+
+    // 2. Apagar a imagem
+    await fetch(`${api}/${filename}`,{method:'DELETE',headers,body:JSON.stringify({message:`Remover capa: ${filename}`,sha:imgData.sha})});
+
+    // 3. Actualizar index.json
+    const idxRes=await fetch(`${api}/index.json`,{headers});
+    if(idxRes.ok){
+      const idxData=await idxRes.json();
+      const index=JSON.parse(atob(idxData.content.replace(/\s/g,''))).filter(c=>c.filename!==filename);
+      await fetch(`${api}/index.json`,{method:'PUT',headers,body:JSON.stringify({message:'Índice actualizado',sha:idxData.sha,content:btoa(unescape(encodeURIComponent(JSON.stringify(index,null,2))))})});
+    }
+
+    await refreshCapas();
+    renderCapas();
+  } catch(e){
+    alert('❌ Erro ao apagar: '+(e.message||e));
+  }
+}
+
 function openLightbox(src){ document.getElementById('lb-img').src=src; document.getElementById('lightbox').classList.add('open'); }
 function closeLightbox(){ document.getElementById('lightbox').classList.remove('open'); }
 
