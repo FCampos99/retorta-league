@@ -706,7 +706,47 @@ function renderCapas(){
   if(dz){ dz.ondragover=e=>{e.preventDefault();dz.classList.add('drag');}; dz.ondragleave=()=>dz.classList.remove('drag'); dz.ondrop=e=>{e.preventDefault();dz.classList.remove('drag');handleFiles(e.dataTransfer.files);}; }
 }
 function compress(file,cb){ const img=new Image(),url=URL.createObjectURL(file); img.onload=()=>{ let w=img.width,h=img.height; if(w>1200){h=Math.round(h*1200/w);w=1200;} if(h>1600){w=Math.round(w*1600/h);h=1600;} const cv=document.createElement('canvas'); cv.width=w; cv.height=h; cv.getContext('2d').drawImage(img,0,0,w,h); URL.revokeObjectURL(url); cb(cv.toDataURL('image/jpeg',.85)); }; img.src=url; }
-function handleFiles(files){ Array.from(files).forEach(f=>{ if(!f.type.startsWith('image/')) return; compress(f,src=>{ const date=new Date().toISOString(); fetch('http://localhost:8765/upload-capa',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({src,date,caption:''})}).then(r=>r.json()).then(d=>{ if(d.ok){alert('✅ Capa guardada e publicada!');location.reload();} }).catch(()=>{ const key='retorta_jornais'; const list=JSON.parse(localStorage.getItem(key)||'[]'); list.push({src,date,caption:''}); localStorage.setItem(key,JSON.stringify(list)); alert('✅ Capa guardada localmente (inicia o servidor para publicar no GitHub)'); renderCapas(); }); }); }); }
+function handleFiles(files){
+  const token=getToken();
+  if(!token){ alert('Configura o teu GitHub token no ⚙️ primeiro.'); openSettings(); return; }
+  Array.from(files).forEach(f=>{
+    if(!f.type.startsWith('image/')) return;
+    compress(f, async src=>{
+      const date=new Date().toISOString();
+      const ts=date.replace(/\D/g,'').slice(0,12);
+      const filename=`${ts}.jpg`;
+      const base64=src.split(',')[1]; // só a parte base64, sem o prefixo data:...
+      const api=`https://api.github.com/repos/${REPO}/contents/capas`;
+      const headers={'Authorization':`token ${token}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'};
+
+      try {
+        // 1. Fazer upload da imagem
+        const imgRes=await fetch(`${api}/${filename}`,{method:'PUT',headers,body:JSON.stringify({message:`Capa: ${filename}`,content:base64})});
+        if(!imgRes.ok){ const e=await imgRes.json(); throw new Error(e.message); }
+
+        // 2. Ler index.json actual (precisamos do SHA para actualizar)
+        let index=[], sha=null;
+        const idxRes=await fetch(`${api}/index.json`,{headers});
+        if(idxRes.ok){
+          const d=await idxRes.json();
+          sha=d.sha;
+          index=JSON.parse(atob(d.content.replace(/\s/g,'')));
+        }
+
+        // 3. Adicionar nova entrada
+        index.push({filename,date,caption:''});
+        const newContent=btoa(unescape(encodeURIComponent(JSON.stringify(index,null,2))));
+        const idxBody={message:'Índice de capas actualizado',content:newContent};
+        if(sha) idxBody.sha=sha;
+        await fetch(`${api}/index.json`,{method:'PUT',headers,body:JSON.stringify(idxBody)});
+
+        alert('✅ Capa publicada no GitHub! Recarrega a página em 1 minuto para ver.');
+      } catch(e) {
+        alert('❌ Erro ao publicar: '+(e.message||e)+'\nVerifica o teu token no ⚙️');
+      }
+    });
+  });
+}
 
 /* ── LIGHTBOX ── */
 function openLightbox(src){ document.getElementById('lb-img').src=src; document.getElementById('lightbox').classList.add('open'); }
