@@ -373,6 +373,26 @@ function switchTab(id){
 
 /* ── HELPERS ── */
 function pct(n){ return Math.round(n*100); }
+
+function calcStreaks(resultados){
+  let maxW=0,maxL=0,curW=0,curL=0;
+  for(const r of resultados){
+    if(r==='W'){curW++;curL=0;if(curW>maxW)maxW=curW;}
+    else if(r==='L'){curL++;curW=0;if(curL>maxL)maxL=curL;}
+    // null = não jogou, não quebra a sequência
+  }
+  return {maxW,maxL};
+}
+
+function seasonStreaks(season){
+  let bW={p:null,n:0},bL={p:null,n:0};
+  for(const p of season.jogadores){
+    const {maxW,maxL}=calcStreaks(p.resultados);
+    if(maxW>bW.n) bW={p,n:maxW};
+    if(maxL>bL.n) bL={p,n:maxL};
+  }
+  return {bW,bL};
+}
 function medal(r){ return r===1?'p1':r===2?'p2':r===3?'p3':'pn'; }
 function initials(n){ return n.split(' ').filter((_,i,a)=>i===0||i===a.length-1).map(w=>w[0]).join('').toUpperCase(); }
 function wrColor(w){ return w>=60?'var(--green)':w>=50?'var(--gold2)':'var(--red)'; }
@@ -430,6 +450,23 @@ function renderSeason(season){
       </table>
     </div>
     <p style="font-size:.68rem;color:var(--muted);margin-top:.5rem">Média = Taxa de vitórias × Factor de presença. Clica num jogador para ver o historial.</p>
+    ${(()=>{
+      const {bW,bL}=seasonStreaks(season);
+      if(!bW.p&&!bL.p) return '';
+      return `<div class="sec-title" style="margin-top:1.75rem">Sequências da Época</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:.5rem">
+        <div class="pill" style="text-align:left;padding:.8rem 1rem">
+          <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.3rem">🔥 Maior série de vitórias</div>
+          <div style="font-family:var(--fh);font-size:1.6rem;color:var(--green);line-height:1">${bW.n}V</div>
+          <div style="font-size:.78rem;color:var(--muted2);margin-top:.2rem">${bW.p?.alcunha||'—'} · ${bW.p?.nome||''}</div>
+        </div>
+        <div class="pill" style="text-align:left;padding:.8rem 1rem">
+          <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.3rem">💀 Maior série de derrotas</div>
+          <div style="font-family:var(--fh);font-size:1.6rem;color:var(--red);line-height:1">${bL.n}D</div>
+          <div style="font-size:.78rem;color:var(--muted2);margin-top:.2rem">${bL.p?.alcunha||'—'} · ${bL.p?.nome||''}</div>
+        </div>
+      </div>`;
+    })()}
     ${season.atual ? buildReportForm(season) : ''}`;
 }
 
@@ -606,13 +643,18 @@ async function pollAction(){
 function renderAllTime(){
   const pm={};
   SEASONS.forEach(s=>s.jogadores.forEach(p=>{
-    if(!pm[p.nome]) pm[p.nome]={nome:p.nome,alc:p.alcunha,j:0,v:0,epocas:0};
+    if(!pm[p.nome]) pm[p.nome]={nome:p.nome,alc:p.alcunha,j:0,v:0,epocas:0,maxW:0,maxL:0};
     pm[p.nome].j+=p.jogos; pm[p.nome].v+=p.vitorias; pm[p.nome].epocas++;
+    const {maxW,maxL}=calcStreaks(p.resultados);
+    if(maxW>pm[p.nome].maxW) pm[p.nome].maxW=maxW;
+    if(maxL>pm[p.nome].maxL) pm[p.nome].maxL=maxL;
   }));
   const pl=Object.values(pm).filter(p=>p.j>=3);
   const byV=[...pl].sort((a,b)=>b.v-a.v).slice(0,8);
   const byWR=[...pl].filter(p=>p.j>=10).sort((a,b)=>(b.v/b.j)-(a.v/a.j)).slice(0,8);
   const byJ=[...pl].sort((a,b)=>b.j-a.j).slice(0,8);
+  const byStrW=[...pl].sort((a,b)=>b.maxW-a.maxW).slice(0,8);
+  const byStrL=[...pl].sort((a,b)=>b.maxL-a.maxL).slice(0,8);
   const champs=[
     {s:'Época de Verão · 1.ª Edição (2024)',    w:'João Capela',    r:'13V/6D · 68%'},
     {s:'Época de Inverno · 1.ª Edição (2024-25)',w:'João Capela',    r:'13V/5D · 72%'},
@@ -636,6 +678,8 @@ function renderAllTime(){
       <div class="at-card"><h3>⚽ Mais Vitórias</h3>${list(byV,p=>p.v+'V')}</div>
       <div class="at-card"><h3>📈 Melhor Taxa (mín. 10J)</h3>${list(byWR,p=>Math.round(p.v/p.j*100)+'%')}</div>
       <div class="at-card"><h3>🎽 Mais Presenças</h3>${list(byJ,p=>p.j+'J')}</div>
+      <div class="at-card"><h3>🔥 Maior Série de Vitórias</h3>${list(byStrW,p=>p.maxW+'V seguidas')}</div>
+      <div class="at-card"><h3>💀 Maior Série de Derrotas</h3>${list(byStrL,p=>p.maxL+'D seguidas')}</div>
     </div>`;
 }
 
