@@ -278,7 +278,6 @@ footer a{color:var(--gold);text-decoration:none;}
     </div>
     <div class="hdr-right">
       <span class="live-badge" id="hdr-badge" style="display:none">Época Activa</span>
-      <button class="gear-btn" onclick="openSettings()" title="Configurações">⚙️</button>
     </div>
   </div>
 </header>
@@ -305,12 +304,11 @@ footer a{color:var(--gold);text-decoration:none;}
     <button class="modal-close" onclick="closeSettings()">✕</button>
     <h2>⚙️ Configurações</h2>
     <div class="settings-field">
-      <label>GitHub Personal Access Token</label>
-      <input type="password" id="gh-token-input" placeholder="github_pat_..." autocomplete="off">
+      <label>Chave de acesso para reportar jogos</label>
+      <input type="password" id="gh-token-input" placeholder="Chave de acesso..." autocomplete="off">
       <div class="settings-note">
-        Necessário para reportar jogos directamente do site.<br>
-        Cria em <a href="https://github.com/settings/tokens" target="_blank">github.com/settings/tokens</a> → 
-        Fine-grained token → Repository: <b>retorta-league</b> → Permissions: <b>Actions → Read and write</b>.
+        Necessário apenas para reportar resultados de jogos.<br>
+        Pede a chave ao administrador da liga.
       </div>
     </div>
     <button class="btn-save" onclick="saveSettings()">Guardar</button>
@@ -504,8 +502,8 @@ function buildReportForm(season){
     <div class="rpt-sec">
       <div class="rpt-head"><h3>📋 Reportar Jogo</h3></div>
       <div class="rpt-no-token">
-        Para reportar jogos directamente do site, configura o teu GitHub token.<br>
-        <button onclick="openSettings()" style="background:var(--gold);color:#000;border:none;border-radius:8px;padding:.5rem 1.2rem;font-weight:700;cursor:pointer;margin-top:.5rem">⚙️ Configurar token</button>
+        Para reportar jogos é necessário configurar o acesso.<br>
+        <button onclick="openSettings()" style="background:var(--gold);color:#000;border:none;border-radius:8px;padding:.5rem 1.2rem;font-weight:700;cursor:pointer;margin-top:.5rem">Configurar acesso</button>
       </div>
     </div>`;
 
@@ -513,7 +511,7 @@ function buildReportForm(season){
     <div class="rpt-sec">
       <div class="rpt-head">
         <h3>📋 Reportar Jogo</h3>
-        <div style="display:flex;align-items:center;gap:.4rem;font-size:.75rem"><span class="dot ok"></span><span>GitHub conectado</span></div>
+        <div style="display:flex;align-items:center;gap:.4rem;font-size:.75rem"><span class="dot ok"></span><span>Pronto</span></div>
       </div>
       <div class="rpt-body">
 
@@ -601,7 +599,7 @@ async function submitReport(seasonId){
   if(!W.length||!L.length){ setMsg('Selecciona pelo menos um jogador em cada equipa.','var(--red)'); return; }
   const btn=document.getElementById('rpt-btn');
   btn.disabled=true; btn.textContent='A enviar...';
-  setMsg('<span class="rpt-progress"><span class="spinner"></span> A enviar para o GitHub...</span>','');
+  setMsg('<span class="rpt-progress"><span class="spinner"></span> A enviar...</span>','');
   try {
     const res=await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WF_FILE}/dispatches`,{
       method:'POST',
@@ -614,7 +612,7 @@ async function submitReport(seasonId){
       pollAction();
     } else {
       const err=await res.json().catch(()=>({}));
-      setMsg(`❌ Erro: ${err.message||res.status} &nbsp;<a onclick="openSettings()" style="color:var(--gold2);cursor:pointer">⚙️ Verificar token</a>`,'');
+      setMsg(`❌ Erro: ${err.message||res.status}`,'');
       btn.disabled=false; btn.textContent='Reportar Jogo';
     }
   } catch {
@@ -646,7 +644,7 @@ async function pollAction(){
         return;
       }
       const t=document.getElementById('poll-txt');
-      if(t) t.textContent=run.status==='in_progress'?'A correr no GitHub...':'Na fila...';
+      if(t) t.textContent=run.status==='in_progress'?'A processar...':'Na fila...';
     } catch {}
   }
 }
