@@ -302,13 +302,13 @@ footer a{color:var(--gold);text-decoration:none;}
 <div class="modal-overlay" id="settings-overlay">
   <div class="settings-modal">
     <button class="modal-close" onclick="closeSettings()">✕</button>
-    <h2>⚙️ Configurações</h2>
+    <h2>🔑 Reportar Jogos</h2>
     <div class="settings-field">
-      <label>Chave de acesso para reportar jogos</label>
-      <input type="password" id="gh-token-input" placeholder="Chave de acesso..." autocomplete="off">
+      <label>Palavra-passe</label>
+      <input type="password" id="gh-token-input" placeholder="••••••••" autocomplete="off">
       <div class="settings-note">
-        Necessário apenas para reportar resultados de jogos.<br>
-        Pede a chave ao administrador da liga.
+        Necessária para reportar resultados de jogos.<br>
+        Pede a palavra-passe ao Campos.
       </div>
     </div>
     <button class="btn-save" onclick="saveSettings()">Guardar</button>
@@ -595,28 +595,30 @@ function updatePreview(){
 async function submitReport(seasonId){
   const date=document.getElementById('rpt-date').value;
   const W=[],L=[];
-  document.querySelectorAll('.chip').forEach(c=>{ if(c.dataset.r==='W') W.push(c.dataset.name); else if(c.dataset.r==='L') L.push(c.dataset.name); });
+  document.querySelectorAll('.pc').forEach(c=>{ if(c.dataset.r==='W') W.push(c.dataset.name); else if(c.dataset.r==='L') L.push(c.dataset.name); });
   if(!W.length||!L.length){ setMsg('Selecciona pelo menos um jogador em cada equipa.','var(--red)'); return; }
+  const password=getToken();
+  if(!password){ openSettings(); return; }
   const btn=document.getElementById('rpt-btn');
   btn.disabled=true; btn.textContent='A enviar...';
   setMsg('<span class="rpt-progress"><span class="spinner"></span> A enviar...</span>','');
   try {
-    const res=await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${WF_FILE}/dispatches`,{
+    const res=await fetch('/api/report',{
       method:'POST',
-      headers:{'Authorization':`token ${getToken()}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-      body:JSON.stringify({ref:'main',inputs:{season_id:seasonId,date,winners:JSON.stringify(W),losers:JSON.stringify(L)}})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({password,season_id:seasonId,date,winners:W,losers:L})
     });
-    if(res.status===204||res.ok){
+    const d=await res.json();
+    if(d.ok){
       btn.textContent='✅ Enviado!';
       setMsg('<span class="rpt-progress"><span class="spinner"></span> <span id="poll-txt">A processar (~2 min)...</span></span>','');
       pollAction();
     } else {
-      const err=await res.json().catch(()=>({}));
-      setMsg(`❌ Erro: ${err.message||res.status}`,'');
+      setMsg(`❌ ${d.error==='Palavra-passe incorrecta'?'Palavra-passe incorrecta.':d.error}`,'');
       btn.disabled=false; btn.textContent='Reportar Jogo';
     }
   } catch {
-    setMsg('❌ Sem ligação à internet.','');
+    setMsg('❌ Sem ligação.','');
     btn.disabled=false; btn.textContent='Reportar Jogo';
   }
 }
@@ -631,16 +633,14 @@ async function pollAction(){
   for(let i=0;i<20;i++){
     await new Promise(r=>setTimeout(r,10000));
     try {
-      const res=await fetch(`https://api.github.com/repos/${REPO}/actions/runs?event=workflow_dispatch&per_page=1`,{
-        headers:{'Authorization':`token ${getToken()}`,'Accept':'application/vnd.github.v3+json'}
-      });
+      const res=await fetch(`https://api.github.com/repos/${REPO}/actions/runs?event=workflow_dispatch&per_page=1`);
       if(!res.ok) break;
       const run=(await res.json()).workflow_runs?.[0];
       if(!run) continue;
       if(run.status==='completed'){
         run.conclusion==='success'
           ? setMsg('✅ <strong>Actualizado!</strong> <button onclick="location.reload()" style="background:var(--gold);border:none;border-radius:6px;padding:.3rem .8rem;cursor:pointer;font-weight:700;color:#000;margin-left:.5rem">Recarregar</button>','var(--green)')
-          : setMsg(`❌ Algo correu mal. <a href="https://github.com/${REPO}/actions" target="_blank" style="color:var(--gold2)">Ver Actions</a>`,'');
+          : setMsg('❌ Algo correu mal. Tenta de novo.','');
         return;
       }
       const t=document.getElementById('poll-txt');
